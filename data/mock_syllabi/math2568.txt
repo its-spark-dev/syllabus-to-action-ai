@@ -1,0 +1,22 @@
+MATH 2568 – Linear Algebra (Spring 2026)
+Instructor: Prof. Priya Nandakumar
+
+Assignments & Schedule
+Problem Set 1: Vectors — due January 17
+Problem Set 2: Matrix Operations — due January 31 (5%)
+Problem Set 3: Determinants — due February 7
+Problem Set 4: Eigenvalues — due February 21 (5%)
+Problem Set 5: Diagonalization — due March 7
+Problem Set 6: Applications — due April 4 (5%)
+Project Report — due April 18 (15%)
+
+Quiz 1: February 5 (10%)
+Quiz 2: March 5 (10%)
+Final Exam: April 30 (30%)
+
+Grading Breakdown
+Problem Sets: 30%
+Quizzes: 20%
+Project: 15%
+Final Exam: 30%
+Participation: 5%

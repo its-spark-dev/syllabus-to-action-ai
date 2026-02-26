@@ -43,6 +43,24 @@ User Input (Syllabi)
 
 ---
 
+## Deterministic Engine (Pre-AI State)
+
+- The planning engine currently runs fully deterministic without external AI calls.
+- `anchor_date` is required to keep scheduling stable and reproducible across runs.
+- Official `grading_categories` are preserved exactly when present.
+- Distributed category weights are used internally for scoring only.
+- No artificial/distributed weights are displayed in the UI.
+- Summary and risk analysis calculations are driven by the same `anchor_date`.
+
+Architecture overview:
+`app.py` → `generate_plan_with_ai()` → `deterministic_ai_refinement()`
+
+Current runtime mode:
+- `USE_REAL_AI = False` (default)
+- AI integration layer is present but not yet active in default execution.
+
+---
+
 ## 🔮 Future Improvements
 
 - Canvas LMS integration

@@ -1,0 +1,27 @@
+CSE 2331 – Data Structures (Spring 2026)
+Instructor: Dr. Alana Ruiz
+
+Course Overview
+This course covers algorithmic techniques, performance analysis, and core data structures.
+
+Assignments & Schedule
+Homework 1: Arrays and Big-O — due January 19
+Homework 2: Stacks & Queues — due January 26 (5%)
+Homework 3: Trees — due February 2
+Homework 4: Hash Tables — due February 9 (5%)
+Homework 5: Graphs — due February 23
+Homework 6: Sorting & Searching — due March 2 (5%)
+Project Proposal — due February 16 (10%)
+Project Demo — due March 28
+
+Midterm 1: February 12 (20%)
+Midterm 2: March 12 (20%)
+Final Exam: April 29 (25%)
+
+Grading Breakdown
+Homework (6 total): 25%
+Project: 15%
+Midterm 1: 20%
+Midterm 2: 20%
+Final Exam: 25%
+Participation: 5%

@@ -1,0 +1,24 @@
+CSE 2421 – Systems Programming (Spring 2026)
+Instructor: Dr. Renee McBride
+
+Assignments & Schedule
+Lab 1: Unix Tools — due January 22
+Lab 2: Processes — due January 29 (5%)
+Lab 3: Memory — due February 12
+Lab 4: File Systems — due February 26 (5%)
+Lab 5: Threads — due March 5
+Lab 6: Networking — due March 19 (5%)
+Project Checkpoint — due March 26
+Final Project Report — due April 16 (20%)
+
+Midterm 1: February 19 (20%)
+Midterm 2: March 26 (20%)
+Final Exam: May 1 (25%)
+
+Grading Breakdown
+Labs: 25%
+Project: 20%
+Midterm 1: 20%
+Midterm 2: 20%
+Final Exam: 25%
+Participation: 5%

@@ -1,0 +1,42 @@
+CSE 3470 – Advanced Software Systems
+
+Instructor: Dr. Emily Carter
+Office Hours: Wed 3–5pm
+Location: Dreese Labs 280
+
+Course Description:
+This course covers distributed systems, concurrency, and large-scale architecture design.
+
+Grading Breakdown:
+Homework Assignments (8 total) – 20%
+Programming Project – 25%
+Midterm Exam – 20%
+Final Exam – 30%
+Participation & Attendance – 5%
+
+Homework 1 – Threads and Processes (Due Jan 29)
+Homework 2 – Synchronization (Due Feb 5)
+Homework 3 – Deadlocks (Due Feb 12)
+Homework 4 – Distributed Systems Intro (Due Feb 19)
+Homework 5 – RPC and Messaging (Due Feb 26)
+Homework 6 – Fault Tolerance (Due March 10)
+Homework 7 – Scaling Strategies (Due March 24)
+Homework 8 – Microservices (Due April 7)
+
+Quiz 1 – Concurrency Basics (Feb 8)
+Quiz 2 – Deadlocks & Recovery (Feb 22)
+Quiz 3 – RPC & Messaging (March 17)
+
+Midterm Exam – March 5 (20%)
+
+Programming Project Proposal – Feb 15 (5%)
+Programming Project Milestone 1 – March 20 (5%)
+Programming Project Milestone 2 – April 10 (5%)
+Programming Project Final Submission – April 20 (10%)
+
+Final Exam – Comprehensive – April 30 (30%)
+
+Important Notes:
+- Late homework loses 10% per day.
+- Project milestones must be completed sequentially.
+- Final exam covers Chapters 1–14.
