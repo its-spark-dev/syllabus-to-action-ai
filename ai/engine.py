@@ -639,38 +639,111 @@ def deterministic_ai_refinement(
 
 
 def call_ibm_ai(
-    parsed_syllabi: List[Dict[str, object]],
-    weekly_plan: Dict[str, List[str]],
-    anchor_date: Optional[date] = None,
-) -> Dict[str, Dict[str, object]]:
+    deterministic_result: Dict[str, object],
+    anchor_date: date,
+) -> Dict[str, object]:
     """
-    Build a prompt and call IBM WatsonX/Granite model.
-
-    Returns the same structure as deterministic_ai_refinement.
+    Build a strict JSON prompt and call IBM WatsonX/Granite model for insights only.
+    The deterministic_result remains the source of truth for schedules/weights.
     """
     import json
+    import os
 
-    # TODO: replace with your IBM WatsonX credentials and configuration.
-    # Example (pseudo-code, adjust to your SDK version):
-    # from ibm_watsonx_ai import Credentials
-    # from ibm_watsonx_ai.foundation_models import Model
-    # credentials = Credentials(
-    #     api_key="YOUR_API_KEY",
-    #     url="YOUR_WATSONX_URL",
-    # )
-    # model = Model(
-    #     model_id="granite-text-v1",
-    #     credentials=credentials,
-    #     project_id="YOUR_PROJECT_ID",
-    # )
+    prompt_payload = {
+        "weekly_plan": deterministic_result.get("weekly_plan", {}),
+        "study_guide": deterministic_result.get("study_guide", {}),
+        "anchor_date": anchor_date.isoformat(),
+    }
+    prompt = (
+        "SYSTEM: You are an academic workload strategist.\n"
+        "Your role is to detect workload patterns, risk clusters, and strategic adjustments.\n"
+        "Analyze the input JSON and return JSON only.\n"
+        "Detect deadline clustering.\n"
+        "Identify high-weight compression.\n"
+        "Suggest pre-loading or redistribution strategy.\n"
+        "Recommendations must be actionable, not generic.\n"
+        "Use quantified reasoning when possible (mention week labels and/or weights).\n"
+        "Do not restate the input.\n"
+        "Do not fabricate new deadlines or weights.\n"
+        "Do not modify weights, priority, due dates, or weekly grouping.\n"
+        "Return strictly this schema:\n"
+        "{\n"
+        '  "ai_insights": {\n'
+        '    "global_analysis": [string],\n'
+        '    "course_strategies": {\n'
+        '      "<course_name>": {\n'
+        '        "risk_commentary": [string],\n'
+        '        "study_strategy": [string],\n'
+        '        "time_allocation_suggestion": {\n'
+        '          "suggested_hours_per_week": number,\n'
+        '          "focus_split_percent": {\n'
+        '            "exam_prep": number,\n'
+        '            "projects": number,\n'
+        '            "homework": number\n'
+        "          }\n"
+        "        }\n"
+        "      }\n"
+        "    }\n"
+        "  }\n"
+        "}\n"
+        "Input JSON:\n"
+        f"{json.dumps(prompt_payload)}"
+    )
 
-    prompt = build_ibm_prompt(parsed_syllabi, weekly_plan)
+    def _extract_response_text(response: object) -> str:
+        if isinstance(response, str):
+            return response
+        if isinstance(response, dict):
+            direct_text = response.get("generated_text")
+            if isinstance(direct_text, str):
+                return direct_text
 
-    # TODO: replace with the real model invocation.
-    # response_text = model.generate_text(prompt=prompt, parameters={"max_new_tokens": 1200})
-    response_text = ""  # placeholder for the LLM response text
+            results = response.get("results")
+            if isinstance(results, list) and results:
+                first = results[0]
+                if isinstance(first, str):
+                    return first
+                if isinstance(first, dict):
+                    for key in ("generated_text", "output_text", "text"):
+                        value = first.get(key)
+                        if isinstance(value, str):
+                            return value
 
-    def _parse_model_output(text: str) -> Optional[Dict[str, Dict[str, object]]]:
+            choices = response.get("choices")
+            if isinstance(choices, list) and choices:
+                first_choice = choices[0]
+                if isinstance(first_choice, dict):
+                    text = first_choice.get("text")
+                    if isinstance(text, str):
+                        return text
+
+        return ""
+
+    try:
+        from ibm_watsonx_ai import Credentials
+        from ibm_watsonx_ai.foundation_models import Model
+
+        credentials = Credentials(
+            api_key=os.environ["WATSONX_API_KEY"],
+            url=os.environ["WATSONX_URL"],
+        )
+        model = Model(
+            model_id="granite-13b-instruct-v2",
+            credentials=credentials,
+            project_id=os.environ["WATSONX_PROJECT_ID"],
+        )
+        response = model.generate_text(
+            prompt=prompt,
+            parameters={
+                "max_new_tokens": 1200,
+                "temperature": 0.2,
+            },
+        )
+        response_text = _extract_response_text(response)
+    except Exception:
+        return deterministic_result
+
+    def _parse_model_output(text: str) -> Optional[Dict[str, object]]:
         if not text:
             return None
         try:
@@ -687,14 +760,64 @@ def call_ibm_ai(
                 return None
         return None
 
+    def _is_string_list(value: object) -> bool:
+        return isinstance(value, list) and all(isinstance(item, str) for item in value)
+
+    def _is_number(value: object) -> bool:
+        return isinstance(value, (int, float))
+
+    def _is_valid_ai_output(payload: object) -> bool:
+        if not isinstance(payload, dict) or set(payload.keys()) != {"ai_insights"}:
+            return False
+        ai_insights = payload.get("ai_insights")
+        if not isinstance(ai_insights, dict):
+            return False
+        if set(ai_insights.keys()) != {"global_analysis", "course_strategies"}:
+            return False
+        if not _is_string_list(ai_insights.get("global_analysis")):
+            return False
+
+        course_strategies = ai_insights.get("course_strategies")
+        if not isinstance(course_strategies, dict):
+            return False
+
+        for course_name, strategy in course_strategies.items():
+            if not isinstance(course_name, str) or not isinstance(strategy, dict):
+                return False
+            if set(strategy.keys()) != {
+                "risk_commentary",
+                "study_strategy",
+                "time_allocation_suggestion",
+            }:
+                return False
+            if not _is_string_list(strategy.get("risk_commentary")):
+                return False
+            if not _is_string_list(strategy.get("study_strategy")):
+                return False
+
+            allocation = strategy.get("time_allocation_suggestion")
+            if not isinstance(allocation, dict):
+                return False
+            if set(allocation.keys()) != {"suggested_hours_per_week", "focus_split_percent"}:
+                return False
+            if not _is_number(allocation.get("suggested_hours_per_week")):
+                return False
+
+            split = allocation.get("focus_split_percent")
+            if not isinstance(split, dict):
+                return False
+            if set(split.keys()) != {"exam_prep", "projects", "homework"}:
+                return False
+            if not all(_is_number(split.get(key)) for key in ("exam_prep", "projects", "homework")):
+                return False
+
+        return True
+
     parsed = _parse_model_output(response_text)
-    if not parsed:
-        return deterministic_ai_refinement(parsed_syllabi, weekly_plan, anchor_date=anchor_date)
+    if not _is_valid_ai_output(parsed):
+        return deterministic_result
 
-    if "weekly_plan" not in parsed or "study_guide" not in parsed:
-        return deterministic_ai_refinement(parsed_syllabi, weekly_plan, anchor_date=anchor_date)
-
-    return parsed
+    return {**deterministic_result, **parsed}
 
 
 def build_ibm_prompt(
@@ -786,10 +909,16 @@ def generate_plan_with_ai(
     if anchor_date is None:
         raise ValueError("anchor_date required")
 
+    deterministic_result = deterministic_ai_refinement(
+        parsed_syllabi,
+        weekly_plan,
+        anchor_date=anchor_date,
+    )
+
     if USE_REAL_AI:
-        result = call_ibm_ai(parsed_syllabi, weekly_plan, anchor_date=anchor_date)
+        result = call_ibm_ai(deterministic_result, anchor_date=anchor_date)
     else:
-        result = deterministic_ai_refinement(parsed_syllabi, weekly_plan, anchor_date=anchor_date)
+        result = deterministic_result
 
     study_guide = result.get("study_guide", {})
     for course in parsed_syllabi:
