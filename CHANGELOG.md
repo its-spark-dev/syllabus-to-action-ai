@@ -1,6 +1,9 @@
 # Changelog
 
 ## [Unreleased]
+- Pre-AI stabilization freeze completed: deterministic-only execution path documented and consolidated for a clean baseline snapshot.
+- Deterministic anchor-date contract enforced: `generate_plan_with_ai` now requires `anchor_date` to eliminate runtime date drift and ensure stable scheduling behavior.
+- UI-facing weight display contract tightened: only explicit assessment weights are shown in tasks/upcoming items; distributed/internal weights remain scoring-only and `None%` display is removed.
 - Category-based weight distribution instead of naive equal split: distributes grading-category weight across unweighted matching items to avoid inflating single tasks; implemented via category matching and per-item allocation in deterministic scoring.
 - Effective weight logic for priority scoring: uses explicit task weight when present, otherwise uses distributed category weight to compute priority; prevents over- or under-weighting tasks without explicit percentages.
 - Exam guard mechanism for high-weight exams within 14 days: ensures upcoming high-weight exams sort ahead of low-value work, keeping critical assessments at the top of weekly priorities.
