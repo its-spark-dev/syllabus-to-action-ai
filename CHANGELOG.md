@@ -1,9 +1,25 @@
 # Changelog
 
 ## [Unreleased]
+- Added deterministic `compute_ai_intelligence()` layer and appended `ai_intelligence` to AI outputs without changing deterministic scheduling logic.
+- Added AI intelligence outputs:
+  - `stress_score`, `acceleration_index`, `burnout_probability`
+  - `structural_overload`, `alert_level`, `insights`, `strategy`, `confidence`
+- Added structural overload rule:
+  - `weekly_stress_score > p85_stress` and at least 2 assessments with `>=10%` weight inside a 10-day window.
+- Added explicit alert tiers for AI intelligence:
+  - `0–39 Normal`, `40–59 Elevated`, `60–79 High Risk`, `80–100 Critical`.
+- Fixed AI KPI data-binding to finalized `weekly_metrics`:
+  - `acceleration_index` from max weekly `stress_acceleration_percent`.
+  - `compression_risk` from peak-week `compression_weight_percent * compression_window_days`.
+  - Added peak-week mismatch warning + debug logs for `peak_week`, `acceleration_index`, and `compression_risk`.
+- Added dashboard compatibility alias keys in `call_ai_intelligence()` output:
+  - `kpis.stress_acceleration_index` (alias of `acceleration_index`)
+  - `kpis.compression_risk_score` (alias of `compression_risk`)
+  - Existing keys preserved; no breaking removal.
 - Hardened AI KPI calculation to use real `weekly_metrics` values:
   - `acceleration_index` now derives from max `stress_acceleration_percent` across weeks.
-  - `compression_risk` now derives from peak-week `compression_weight_percent` × `compression_window_days` (normalized/capped).
+  - `compression_risk` now derives from peak-week `compression_weight_percent` × `compression_window_days`.
   - Added warning log when `peak_week` is missing from `weekly_metrics` and fallback week selection is applied.
 - Expanded AI output schema stability and determinism:
   - Added `peak_delta_percent` to KPI block (baseline vs scenario).

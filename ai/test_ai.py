@@ -77,11 +77,13 @@ kpis = ai_output.get("kpis", {}) if isinstance(ai_output, dict) else {}
 why_risky = ai_output.get("why_risky", {}) if isinstance(ai_output, dict) else {}
 simulation_impact = ai_output.get("simulation_impact", {}) if isinstance(ai_output, dict) else {}
 allocation = ai_output.get("time_allocation_strategy", {}) if isinstance(ai_output, dict) else {}
+ai_intelligence = ai_output.get("ai_intelligence", {}) if isinstance(ai_output, dict) else {}
 
 assert isinstance(kpis, dict), "kpis must be a dict"
 assert isinstance(why_risky, dict), "why_risky must be a dict"
 assert isinstance(simulation_impact, dict), "simulation_impact must be a dict"
 assert isinstance(allocation, dict), "time_allocation_strategy must be a dict"
+assert isinstance(ai_intelligence, dict), "ai_intelligence must be a dict"
 
 for key in (
     "peak_stress_score",
@@ -108,6 +110,28 @@ for key in ("peak_delta_percent", "week_shift_detected", "driver_task", "explana
     assert key in simulation_impact, f"missing simulation_impact field: {key}"
 for key in ("exam_prep", "projects", "homework"):
     assert key in allocation, f"missing allocation field: {key}"
+for key in (
+    "stress_score",
+    "acceleration_index",
+    "burnout_probability",
+    "compression_risk",
+    "structural_overload",
+    "alert_level",
+    "insights",
+    "strategy",
+    "confidence",
+):
+    assert key in ai_intelligence, f"missing ai_intelligence field: {key}"
+
+assert round(float(kpis.get("acceleration_index") or 0.0), 1) == round(
+    float(ai_intelligence.get("acceleration_index") or 0.0), 1
+), "kpis.acceleration_index must bind to ai_intelligence"
+assert round(float(kpis.get("compression_risk") or 0.0), 1) == round(
+    float(ai_intelligence.get("compression_risk") or 0.0), 1
+), "kpis.compression_risk must bind to ai_intelligence"
+
+assert isinstance(ai_intelligence.get("insights"), list), "ai_intelligence.insights must be a list"
+assert isinstance(ai_intelligence.get("strategy"), list), "ai_intelligence.strategy must be a list"
 
 allocation_total = (
     float(allocation.get("exam_prep") or 0.0)

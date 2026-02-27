@@ -73,6 +73,11 @@ Current runtime mode:
   - `acceleration_index`
   - `compression_risk`
   - `peak_delta_percent`
+  - compatibility aliases: `stress_acceleration_index`, `compression_risk_score`
+- Additional AI intelligence block (`ai_intelligence`) includes:
+  - `stress_score`, `acceleration_index`, `burnout_probability`
+  - `structural_overload`, `alert_level`
+  - `insights[]`, `strategy[]`, `confidence`
 - `why_risky` includes structured peak-week root-cause metrics:
   - `exam_count`, `milestone_count`, `weekly_weight_sum`
   - `compression_weight_percent`, `compression_window_days`
@@ -86,6 +91,10 @@ Current runtime mode:
   - compression presence
   - nearest upcoming exam weight
   - normalized to 100%.
+- AI KPI binding rules:
+  - `acceleration_index` is derived from max weekly `stress_acceleration_percent`.
+  - `compression_risk` is derived from peak-week `compression_weight_percent * compression_window_days`.
+  - peak-week mismatch emits a warning log and falls back to highest-stress week.
 
 ---
 
