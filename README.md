@@ -45,19 +45,64 @@ User Input (Syllabi)
 
 ## Deterministic Engine (Pre-AI State)
 
-- The planning engine currently runs fully deterministic without external AI calls.
-- `anchor_date` is required to keep scheduling stable and reproducible across runs.
+- The planning core remains deterministic and reproducible.
+- `anchor_date` is required to keep scheduling stable across runs.
 - Official `grading_categories` are preserved exactly when present.
 - Distributed category weights are used internally for scoring only.
-- No artificial/distributed weights are displayed in the UI.
-- Summary and risk analysis calculations are driven by the same `anchor_date`.
+- No artificial/distributed weights are displayed in UI task labels.
+- Weekly risk/stress metrics are computed deterministically and exposed to the AI intelligence layer.
 
 Architecture overview:
 `app.py` → `generate_plan_with_ai()` → `deterministic_ai_refinement()`
 
 Current runtime mode:
 - `USE_REAL_AI = False` (default)
-- AI integration layer is present but not yet active in default execution.
+- IBM watsonx integration is available (`granite-4-h-small`) and guarded by deterministic fallback logic.
+
+---
+
+## AI Intelligence Layer (Current)
+
+- Single-request AI contract with strict JSON schema validation.
+- Deterministic fallback is always available when parsing/model calls fail.
+- KPI block includes:
+  - `peak_stress_score`
+  - `volatility_index`
+  - `risk_week_ratio`
+  - `burnout_probability_percent`
+  - `acceleration_index`
+  - `compression_risk`
+  - `peak_delta_percent`
+- `why_risky` includes structured peak-week root-cause metrics:
+  - `exam_count`, `milestone_count`, `weekly_weight_sum`
+  - `compression_weight_percent`, `compression_window_days`
+  - `stress_acceleration_percent`
+- Simulation intelligence includes:
+  - deterministic scenario selection
+  - `simulation_impact` with peak delta + week-shift signal
+  - narrative reporting peak/shift/acceleration/compression changes
+- Time allocation strategy is derived from:
+  - total exam weight across courses
+  - compression presence
+  - nearest upcoming exam weight
+  - normalized to 100%.
+
+---
+
+## Dashboards
+
+- `app.py`: baseline Streamlit interface.
+- `dashboard_app.py`: premium SaaS-style dashboard (glass dark theme + Plotly intelligence charts) using the same backend outputs without changing engine behavior.
+
+---
+
+## Quick Validation
+
+Run AI layer integration check with mock syllabi:
+
+```bash
+python3 ai/test_ai.py
+```
 
 ---
 

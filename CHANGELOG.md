@@ -1,6 +1,25 @@
 # Changelog
 
 ## [Unreleased]
+- Hardened AI KPI calculation to use real `weekly_metrics` values:
+  - `acceleration_index` now derives from max `stress_acceleration_percent` across weeks.
+  - `compression_risk` now derives from peak-week `compression_weight_percent` × `compression_window_days` (normalized/capped).
+  - Added warning log when `peak_week` is missing from `weekly_metrics` and fallback week selection is applied.
+- Expanded AI output schema stability and determinism:
+  - Added `peak_delta_percent` to KPI block (baseline vs scenario).
+  - Enforced strict validation for KPI and narrative contracts.
+  - Added deterministic post-parse override to keep critical KPI fields aligned with engine metrics.
+- Upgraded simulation intelligence narrative:
+  - Narrative now explicitly reports peak change, week shift, acceleration change, and compression change.
+  - Scenario selection is deterministic (`active_scenario` precedence, then best peak reduction).
+- Strengthened `why_risky` root-cause explanation:
+  - Uses structured peak-week metrics (`exam_count`, `milestone_count`, `weekly_weight_sum`, `compression_weight_percent`, `compression_window_days`, `stress_acceleration_percent`).
+  - Detail text now references KPI values directly (`peak_stress_score`, `volatility_index`, `risk_week_ratio`, `burnout_probability_percent`, `peak_delta_percent`).
+- Improved time allocation strategy:
+  - Allocation now bases on total exam weight across courses, compression presence, and upcoming exam weight, normalized to 100%.
+- Added/updated engine-side integration checks in `ai/test_ai.py`:
+  - Validates expanded KPI fields.
+  - Validates simulation narrative contract tokens.
 - Added `dashboard_app.py` as a dedicated premium SaaS dashboard UI while preserving existing engine/business outputs (`weekly_plan`, `study_guide`, `weekly_metrics`).
 - Integrated Plotly-based analytics visuals (weekly workload intelligence line chart and per-course grading donut chart) with dark glass styling and responsive rendering.
 - Upgraded chart intelligence UX: peak-week overload highlighting, sustainable threshold detection, stress-acceleration signals, and AI-oriented annotations/tooltips.

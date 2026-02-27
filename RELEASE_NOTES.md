@@ -1,4 +1,22 @@
 ## [Unreleased]
+- AI KPI calculation hardened to rely on real engine `weekly_metrics`:
+  - `acceleration_index` = max weekly stress acceleration.
+  - `compression_risk` = peak-week compression weight × compression window (normalized/capped).
+  - Warning log added when `peak_week` is not present in `weekly_metrics`.
+- Simulation intelligence upgraded:
+  - Added KPI `peak_delta_percent` (baseline vs selected scenario).
+  - Narrative now includes peak change, week shift, acceleration change, and compression change.
+  - Deterministic scenario selection applied when multiple simulation outputs exist.
+- AI explanation depth increased:
+  - `why_risky` now uses structured peak-week root-cause metrics including compression window days.
+  - `why_risky.detail` explicitly references engine KPIs for traceability.
+- Time allocation strategy refined:
+  - Allocation now driven by total exam weight across courses, compression presence, and nearest upcoming exam weight.
+  - Output normalized to exactly 100%.
+- Validation and fallback stability strengthened:
+  - Strict JSON schema enforcement maintained.
+  - Critical KPI values are deterministically synchronized with engine calculations after parse.
+- Integration checks expanded in `ai/test_ai.py` for new KPI and narrative contracts.
 - Pre-AI stabilization freeze completed: deterministic-only execution path documented and consolidated for a clean baseline snapshot.
 - Deterministic anchor-date contract enforced: `generate_plan_with_ai` now requires `anchor_date` to eliminate runtime date drift and ensure stable scheduling behavior.
 - UI-facing weight display contract tightened: only explicit assessment weights are shown in tasks/upcoming items; distributed/internal weights remain scoring-only and `None%` display is removed.

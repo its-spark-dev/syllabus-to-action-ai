@@ -4,7 +4,14 @@ from datetime import date, datetime
 from typing import Dict, List, Tuple
 
 import ai.engine as ai_engine
-from ai.engine import generate_plan_with_ai
+from ai.engine import (
+    build_engine_summary,
+    build_peak_contributors,
+    call_ai_intelligence,
+    generate_plan_with_ai,
+    simulate_shift,
+    strategy_simulation,
+)
 from parser.syllabus_parser import parse_syllabi
 from planner.weekly_planner import generate_weekly_plan
 
@@ -13,13 +20,15 @@ import plotly.graph_objects as go
 
 RISK_LEVEL_ORDER = {
     "Normal": 0,
-    "High Risk": 1,
-    "Critical Risk": 2,
+    "Elevated": 1,
+    "High Risk": 2,
+    "Critical Risk": 3,
 }
 
 RISK_COLOR = {
     "Normal": "#2DD4BF",
-    "High Risk": "#F59E0B",
+    "Elevated": "#F59E0B",
+    "High Risk": "#FB7185",
     "Critical Risk": "#EF4444",
 }
 
@@ -400,6 +409,121 @@ def _aggregate_weekly_risk_and_stress(
                 risk_by_week[week] = risk
 
     return stress_score_by_week, risk_by_week
+
+
+def _weekly_metrics_to_stress_risk(
+    weekly_metrics: Dict[str, Dict[str, object]],
+) -> Tuple[Dict[str, int], Dict[str, str]]:
+    stress_score_by_week: Dict[str, int] = {}
+    risk_by_week: Dict[str, str] = {}
+    for week, metrics in weekly_metrics.items():
+        if not isinstance(metrics, dict):
+            continue
+        stress_score_by_week[str(week)] = int(float(metrics.get("weekly_stress_score") or 0.0))
+        risk_by_week[str(week)] = str(metrics.get("risk_level") or "Normal")
+    return stress_score_by_week, risk_by_week
+
+
+def _render_peak_breakdown(contributors: List[Dict[str, object]], peak_week: str) -> None:
+    st.markdown('<div class="glass-card interactive-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Peak Breakdown</div>', unsafe_allow_html=True)
+    if not contributors:
+        st.info("No peak-week contributors detected.")
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
+
+    st.caption(f"Top contributors for {peak_week}")
+    rows = []
+    for item in contributors:
+        rows.append(
+            {
+                "Task": item.get("task", ""),
+                "Course": item.get("course", ""),
+                "Kind": item.get("kind", ""),
+                "Stress Min": item.get("stress_contribution", 0),
+                "Weight": f"{float(item.get('weight_effective') or 0.0):.1f}%",
+            }
+        )
+    st.table(rows)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def _render_simulation_results(
+    shift_result: Dict[str, object],
+    strategy_result: Dict[str, object],
+) -> None:
+    st.markdown('<div class="glass-card interactive-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">What-if Results</div>', unsafe_allow_html=True)
+
+    shift_error = shift_result.get("error") if isinstance(shift_result, dict) else None
+    strategy_error = strategy_result.get("error") if isinstance(strategy_result, dict) else None
+
+    left, right = st.columns(2)
+    with left:
+        st.markdown("**Shift Simulation**")
+        if shift_error:
+            st.caption(f"Unavailable: {shift_error}")
+        else:
+            st.write(
+                f"Peak: {shift_result.get('peak_before', {}).get('week', 'N/A')} -> "
+                f"{shift_result.get('peak_after', {}).get('week', 'N/A')}"
+            )
+            st.write(f"Delta: {float(shift_result.get('delta_percent') or 0.0):.1f}%")
+            st.write(f"Weeks changed: {int(shift_result.get('changed_week_count') or 0)}")
+
+    with right:
+        st.markdown("**Strategy Simulation**")
+        if strategy_error:
+            st.caption(f"Unavailable: {strategy_error}")
+        else:
+            st.write(
+                f"Peak: {strategy_result.get('peak_before', {}).get('week', 'N/A')} -> "
+                f"{strategy_result.get('peak_after', {}).get('week', 'N/A')}"
+            )
+            st.write(f"Delta: {float(strategy_result.get('delta_percent') or 0.0):.1f}%")
+            st.write(f"Weeks changed: {int(strategy_result.get('changed_week_count') or 0)}")
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def _render_ai_intelligence_card(ai_payload: Dict[str, object]) -> None:
+    st.markdown('<div class="glass-card interactive-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">AI Intelligence Explanation</div>', unsafe_allow_html=True)
+    if not isinstance(ai_payload, dict):
+        st.info("AI intelligence is unavailable.")
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
+
+    kpis = ai_payload.get("kpis", {})
+    why_risky = ai_payload.get("why_risky", [])
+    simulation_narrative = str(ai_payload.get("simulation_narrative") or "")
+    allocation = ai_payload.get("time_allocation_strategy", {})
+
+    kpi_cols = st.columns(3)
+    with kpi_cols[0]:
+        st.metric("Burnout %", f"{float(kpis.get('burnout_probability_percent') or 0.0):.1f}")
+    with kpi_cols[1]:
+        st.metric("Acceleration Index", f"{float(kpis.get('stress_acceleration_index') or 0.0):.1f}")
+    with kpi_cols[2]:
+        st.metric("Compression Risk", f"{float(kpis.get('compression_risk_score') or 0.0):.1f}")
+
+    if isinstance(why_risky, list) and why_risky:
+        st.markdown("**Why risky**")
+        for item in why_risky[:4]:
+            st.write(f"- {item}")
+
+    if simulation_narrative:
+        st.markdown("**Simulation Narrative**")
+        st.write(simulation_narrative)
+
+    if isinstance(allocation, dict):
+        st.markdown(
+            "**Recommended Time Allocation** "
+            f"(Exam {float(allocation.get('exam_prep') or 0.0):.1f}% / "
+            f"Projects {float(allocation.get('projects') or 0.0):.1f}% / "
+            f"Homework {float(allocation.get('homework') or 0.0):.1f}%)"
+        )
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def _collect_upcoming_exam_weight(study_guide: Dict[str, Dict[str, object]]) -> float:
@@ -969,7 +1093,7 @@ def _render_ai_insight_panel(
     burnout_risk = "Normal"
     if risk_by_week:
         burnout_risk = max(risk_by_week.values(), key=lambda item: RISK_LEVEL_ORDER.get(item, 0))
-    hot_weeks = sum(1 for risk in risk_by_week.values() if risk in {"High Risk", "Critical Risk"})
+    hot_weeks = sum(1 for risk in risk_by_week.values() if risk in {"Elevated", "High Risk", "Critical Risk"})
     total_tasks = sum(len(tasks) for tasks in weekly_plan.values())
     max_stress = max(stress_score_by_week.values()) if stress_score_by_week else 0
     peak_week = max(weeks_sorted, key=lambda w: stress_score_by_week.get(w, 0)) if weeks_sorted else "N/A"
@@ -1057,16 +1181,80 @@ def main() -> None:
     )
     weekly_plan = result.get("weekly_plan", {})
     study_guide = result.get("study_guide", {})
-    stress_score_by_week, risk_by_week = _aggregate_weekly_risk_and_stress(study_guide)
+    base_stress_score_by_week, base_risk_by_week = _aggregate_weekly_risk_and_stress(study_guide)
+    engine_summary = build_engine_summary(result)
+    peak_contributors = build_peak_contributors(result, limit=5)
 
-    _render_kpis(weekly_plan, stress_score_by_week, risk_by_week, study_guide)
+    with st.sidebar:
+        st.markdown("### Strategy Controls")
+        task_options = [
+            str(item.get("task") or "")
+            for item in peak_contributors
+            if isinstance(item, dict) and item.get("task")
+        ]
+        selected_task = st.selectbox(
+            "Shift Target",
+            task_options if task_options else ["(no peak tasks)"],
+            key="shift_target_task",
+        )
+        shift_days = st.slider("Shift days", min_value=-14, max_value=14, value=0, step=1)
+        exam_target = st.slider("Target % exam prep", min_value=10, max_value=70, value=38, step=1)
+        project_target = st.slider("Target % projects", min_value=10, max_value=70, value=34, step=1)
+        homework_target = max(5, 100 - exam_target - project_target)
+        st.caption(f"Target % homework: {homework_target}")
+        scenario_view = st.radio(
+            "Chart Scenario",
+            ("Baseline", "Shift", "Strategy"),
+            horizontal=False,
+        )
+
+    shift_result: Dict[str, object]
+    if task_options and selected_task != "(no peak tasks)":
+        shift_result = simulate_shift(result, selected_task, int(shift_days))
+    else:
+        shift_result = {"error": "task_not_found"}
+
+    strategy_result = strategy_simulation(
+        result,
+        {
+            "exam_prep": float(exam_target),
+            "projects": float(project_target),
+            "homework": float(homework_target),
+        },
+    )
+
+    active_stress_by_week = base_stress_score_by_week
+    active_risk_by_week = base_risk_by_week
+    if scenario_view == "Shift" and isinstance(shift_result, dict) and "error" not in shift_result:
+        active_weekly_metrics = shift_result.get("weekly_metrics_after", {})
+        if isinstance(active_weekly_metrics, dict):
+            active_stress_by_week, active_risk_by_week = _weekly_metrics_to_stress_risk(active_weekly_metrics)
+    elif scenario_view == "Strategy" and isinstance(strategy_result, dict) and "error" not in strategy_result:
+        active_weekly_metrics = strategy_result.get("weekly_metrics_after", {})
+        if isinstance(active_weekly_metrics, dict):
+            active_stress_by_week, active_risk_by_week = _weekly_metrics_to_stress_risk(active_weekly_metrics)
+
+    ai_intelligence = call_ai_intelligence(
+        engine_summary,
+        metrics=result,
+        simulation_results={
+            "shift": shift_result,
+            "strategy": strategy_result,
+            "active_scenario": scenario_view,
+        },
+    )
+
+    _render_kpis(weekly_plan, active_stress_by_week, active_risk_by_week, study_guide)
     chart_col_1, chart_col_2 = st.columns(2, gap="large")
     with chart_col_1:
-        render_workload_chart(stress_score_by_week, risk_by_week)
+        render_workload_chart(active_stress_by_week, active_risk_by_week)
     with chart_col_2:
         render_grading_chart(study_guide)
-    _render_ai_insight_panel(weekly_plan, stress_score_by_week, risk_by_week, study_guide)
-    _render_ai_strategy_card(weekly_plan, stress_score_by_week, risk_by_week, study_guide)
+    _render_peak_breakdown(peak_contributors, str(engine_summary.get("peak_week") or "N/A"))
+    _render_simulation_results(shift_result, strategy_result)
+    _render_ai_insight_panel(weekly_plan, active_stress_by_week, active_risk_by_week, study_guide)
+    _render_ai_intelligence_card(ai_intelligence)
+    _render_ai_strategy_card(weekly_plan, active_stress_by_week, active_risk_by_week, study_guide)
     _render_raw_outputs(weekly_plan, study_guide)
 
 
