@@ -1,0 +1,1074 @@
+import streamlit as st
+
+from datetime import date, datetime
+from typing import Dict, List, Tuple
+
+import ai.engine as ai_engine
+from ai.engine import generate_plan_with_ai
+from parser.syllabus_parser import parse_syllabi
+from planner.weekly_planner import generate_weekly_plan
+
+import plotly.graph_objects as go
+
+
+RISK_LEVEL_ORDER = {
+    "Normal": 0,
+    "High Risk": 1,
+    "Critical Risk": 2,
+}
+
+RISK_COLOR = {
+    "Normal": "#2DD4BF",
+    "High Risk": "#F59E0B",
+    "Critical Risk": "#EF4444",
+}
+
+NEON_CHART_COLORS = [
+    "#66F2FF",
+    "#7E8BFF",
+    "#58FFD6",
+    "#FF7BE6",
+    "#B3FF74",
+    "#FFB85C",
+    "#57A6FF",
+    "#4CE1FF",
+    "#B88BFF",
+    "#FFE56A",
+]
+
+
+def _week_sort_key(week_label: str) -> int:
+    parts = week_label.strip().split()
+    if len(parts) == 2 and parts[1].isdigit():
+        return int(parts[1])
+    return 0
+
+
+def _parse_due_date(date_str: str):
+    if not date_str:
+        return None
+    formats = (
+        "%b %d, %Y",
+        "%B %d, %Y",
+        "%b %d",
+        "%B %d",
+        "%m/%d/%Y",
+        "%m/%d/%y",
+        "%m/%d",
+        "%Y-%m-%d",
+    )
+    for fmt in formats:
+        try:
+            parsed = datetime.strptime(date_str, fmt).date()
+            if "%Y" not in fmt:
+                return parsed.replace(year=date.today().year)
+            return parsed
+        except ValueError:
+            continue
+    return None
+
+
+def _inject_styles() -> None:
+    st.markdown(
+        """
+        <style>
+            .stApp {
+                background:
+                    radial-gradient(1200px 680px at 10% -12%, rgba(96, 152, 255, 0.33), transparent 63%),
+                    radial-gradient(980px 560px at 84% 8%, rgba(66, 179, 255, 0.20), transparent 60%),
+                    radial-gradient(760px 460px at 48% 102%, rgba(33, 79, 170, 0.30), transparent 72%),
+                    linear-gradient(160deg, #061026 0%, #091832 42%, #0C1F45 72%, #08132C 100%);
+                color: #E8EEFF;
+            }
+            [data-testid="stHeader"] {
+                background: rgba(0, 0, 0, 0);
+            }
+            .block-container {
+                max-width: 1240px;
+                padding-top: 1.8rem;
+                padding-bottom: 2rem;
+            }
+            [data-testid="stHorizontalBlock"] {
+                gap: 1.2rem;
+                align-items: stretch;
+            }
+            .hero-header {
+                position: relative;
+                padding: 1.2rem 1.4rem 1.25rem;
+                margin-bottom: 1.2rem;
+            }
+            .hero-header::before {
+                content: "";
+                position: absolute;
+                inset: -26px -14px auto -14px;
+                height: 150px;
+                border-radius: 30px;
+                background: radial-gradient(ellipse at center, rgba(123, 171, 255, 0.38) 0%, rgba(123, 171, 255, 0.10) 52%, transparent 78%);
+                filter: blur(12px);
+                z-index: 0;
+                pointer-events: none;
+            }
+            .hero-header::after {
+                content: "";
+                position: absolute;
+                inset: auto 16% -30px 16%;
+                height: 56px;
+                border-radius: 999px;
+                background: radial-gradient(ellipse at center, rgba(97, 143, 255, 0.32) 0%, transparent 75%);
+                filter: blur(10px);
+                z-index: 0;
+                pointer-events: none;
+            }
+            .hero-header > * {
+                position: relative;
+                z-index: 1;
+            }
+            .glass-card {
+                background: rgba(15, 25, 55, 0.75);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 28px;
+                backdrop-filter: blur(14px);
+                -webkit-backdrop-filter: blur(14px);
+                box-shadow:
+                    0 22px 48px rgba(4, 11, 34, 0.52),
+                    0 0 44px rgba(92, 148, 255, 0.16),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                    inset 0 -14px 24px rgba(2, 6, 20, 0.35);
+                padding: 1.15rem 1.25rem;
+                margin-bottom: 1.2rem;
+                transition: transform 0.26s ease, box-shadow 0.26s ease, border-color 0.26s ease;
+            }
+            .interactive-card:hover {
+                transform: translateY(-5px);
+                border-color: rgba(182, 213, 255, 0.2);
+                box-shadow:
+                    0 26px 54px rgba(4, 11, 34, 0.6),
+                    0 0 48px rgba(105, 163, 255, 0.22),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                    inset 0 -14px 24px rgba(2, 6, 20, 0.4);
+            }
+            .dashboard-grid {
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 1.15rem;
+                margin-bottom: 0.35rem;
+            }
+            .intel-card {
+                position: relative;
+                overflow: hidden;
+                min-height: 146px;
+            }
+            .intel-card::after {
+                content: "";
+                position: absolute;
+                left: 50%;
+                bottom: -24px;
+                width: 72%;
+                height: 44px;
+                transform: translateX(-50%);
+                border-radius: 999px;
+                background: radial-gradient(ellipse at center, rgba(89, 150, 255, 0.32) 0%, rgba(89, 150, 255, 0.06) 52%, transparent 76%);
+                filter: blur(10px);
+                pointer-events: none;
+            }
+            .intel-card.risk-red::after {
+                background: radial-gradient(ellipse at center, rgba(239, 68, 68, 0.42) 0%, rgba(239, 68, 68, 0.10) 52%, transparent 78%);
+            }
+            .intel-card.risk-red {
+                border-color: rgba(255, 111, 111, 0.28);
+                box-shadow:
+                    0 24px 52px rgba(22, 5, 9, 0.5),
+                    0 0 48px rgba(239, 68, 68, 0.24),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                    inset 0 -14px 24px rgba(45, 5, 8, 0.4);
+            }
+            .ai-badge {
+                display: inline-block;
+                font-size: 0.68rem;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                font-weight: 700;
+                color: #DDE9FF;
+                background: linear-gradient(135deg, rgba(118, 164, 255, 0.35), rgba(73, 115, 236, 0.2));
+                border: 1px solid rgba(187, 209, 255, 0.35);
+                border-radius: 999px;
+                padding: 0.22rem 0.55rem;
+                margin-bottom: 0.42rem;
+            }
+            .kpi-label {
+                color: #AFC5FF;
+                letter-spacing: 0.04em;
+                font-size: 0.76rem;
+                text-transform: uppercase;
+                margin-bottom: 0.3rem;
+            }
+            .kpi-value {
+                color: #FFFFFF;
+                font-size: 1.7rem;
+                font-weight: 700;
+                line-height: 1.2;
+            }
+            .kpi-sub {
+                color: #CFE0FF;
+                font-size: 0.82rem;
+                margin-top: 0.2rem;
+            }
+            .kpi-ai {
+                color: #9EC3FF;
+                font-size: 0.8rem;
+                margin-top: 0.48rem;
+                line-height: 1.4;
+            }
+            .section-title {
+                font-size: 1.08rem;
+                font-weight: 700;
+                color: #EAF1FF;
+                margin-bottom: 0.9rem;
+            }
+            .app-title {
+                font-size: 2.15rem;
+                color: #F5F8FF;
+                font-weight: 800;
+                margin-bottom: 0.22rem;
+                letter-spacing: 0.01em;
+            }
+            .app-subtitle {
+                color: #BFD2FF;
+                margin-bottom: 0;
+                font-size: 0.98rem;
+            }
+            .stTextArea textarea {
+                background: rgba(9, 20, 45, 0.75) !important;
+                color: #ECF2FF !important;
+                border: 1px solid rgba(173, 197, 255, 0.35) !important;
+            }
+            .stButton button {
+                border-radius: 14px;
+            }
+            .js-plotly-plot .slice path {
+                transform-origin: center center;
+                transition: transform 0.18s ease, filter 0.18s ease;
+            }
+            .js-plotly-plot .slice path:hover {
+                transform: scale(1.06);
+                filter: drop-shadow(0 0 10px rgba(129, 198, 255, 0.5));
+            }
+            .js-plotly-plot .hoverlayer .hovertext {
+                filter: drop-shadow(0 0 10px rgba(95, 155, 255, 0.22));
+            }
+            @keyframes peakPulse {
+                0% { transform: scale(1.0); filter: drop-shadow(0 0 3px rgba(166, 242, 255, 0.25)); }
+                50% { transform: scale(1.055); filter: drop-shadow(0 0 7px rgba(166, 242, 255, 0.38)); }
+                100% { transform: scale(1.0); filter: drop-shadow(0 0 3px rgba(166, 242, 255, 0.25)); }
+            }
+            .workload-plot .js-plotly-plot .scatterlayer .trace:last-child path {
+                transform-box: fill-box;
+                transform-origin: center;
+                animation: peakPulse 3.8s ease-in-out infinite;
+            }
+            @media (max-width: 1100px) {
+                .dashboard-grid {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+            }
+            @media (max-width: 700px) {
+                .dashboard-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def _set_sample_syllabi() -> None:
+    st.session_state["course_count"] = 2
+    st.session_state["syllabus_0"] = (
+        "CSE 2331 - Data Structures (Spring 2026)\n"
+        "Instructor: Dr. Alana Ruiz\n"
+        "Location: Dreese Lab 101\n"
+        "Course Description: This course covers algorithmic techniques, data structures,\n"
+        "and performance analysis. Late policy: 10% per day, max 3 days.\n"
+        "\n"
+        "Grading Breakdown\n"
+        "Homework: 25%\n"
+        "Quizzes: 10%\n"
+        "Midterm: 20%\n"
+        "Project: 25%\n"
+        "Final Exam: 20%\n"
+        "\n"
+        "Homework 1: Arrays and Big-O - due January 19\n"
+        "Homework 2: Stacks & Queues - due January 26\n"
+        "Homework 3: Trees - due February 2\n"
+        "Homework 4: Hash Tables - due February 9\n"
+        "Homework 5: Graphs - due February 23\n"
+        "\n"
+        "Quiz 1: February 5\n"
+        "Quiz 2: March 5\n"
+        "Midterm Exam: February 19 (20%)\n"
+        "\n"
+        "Project Milestone 1: Proposal - due February 12 (5%)\n"
+        "Project Milestone 2: Prototype - due March 12 (10%)\n"
+        "Project Submission - due April 2 (10%)\n"
+        "\n"
+        "Final Exam: April 29 (20%)"
+    )
+    st.session_state["syllabus_1"] = (
+        "ECON 1011 - Principles of Microeconomics (Spring 2026)\n"
+        "Instructor: Dr. Michael Huang\n"
+        "Location: Thompson Hall 210\n"
+        "Course Description: Introduces supply and demand, consumer choice,\n"
+        "and market structures. Office Hours: Tue 2-4pm.\n"
+        "\n"
+        "Grading Breakdown\n"
+        "Homework: 20%\n"
+        "Quizzes: 10%\n"
+        "Midterm: 25%\n"
+        "Project: 15%\n"
+        "Final Exam: 30%\n"
+        "\n"
+        "Homework 1: Demand Analysis - due January 21\n"
+        "Homework 2: Elasticity - due February 4\n"
+        "Homework 3: Consumer Choice - due February 18\n"
+        "Homework 4: Costs - due March 4\n"
+        "\n"
+        "Quiz 1: February 6\n"
+        "Quiz 2: March 6\n"
+        "Midterm Exam: March 11 (25%)\n"
+        "\n"
+        "Project Milestone 1: Topic Proposal - due February 20 (5%)\n"
+        "Project Milestone 2: Draft Report - due March 27 (5%)\n"
+        "Project Submission - due April 17 (5%)\n"
+        "\n"
+        "Final Exam: May 2 (30%)"
+    )
+
+
+def _render_input_panel() -> Tuple[List[str], bool, bool]:
+    with st.sidebar:
+        st.markdown("### Input")
+        st.button("Load Sample Syllabi", on_click=_set_sample_syllabi, use_container_width=True)
+        course_count = st.number_input(
+            "Number of courses",
+            min_value=1,
+            max_value=10,
+            value=2,
+            step=1,
+            key="course_count",
+        )
+        use_ai = st.checkbox("Use IBM AI for refinement", value=False)
+        generate_clicked = st.button("Generate Dashboard", use_container_width=True)
+
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    syllabus_inputs: List[str] = []
+    for index in range(int(course_count)):
+        syllabus_inputs.append(
+            st.text_area(
+                f"Course {index + 1} syllabus",
+                placeholder="Paste syllabus here...",
+                key=f"syllabus_{index}",
+                height=160,
+            )
+        )
+    st.markdown("</div>", unsafe_allow_html=True)
+    return syllabus_inputs, use_ai, generate_clicked
+
+
+def _aggregate_weekly_risk_and_stress(
+    study_guide: Dict[str, Dict[str, object]],
+) -> Tuple[Dict[str, int], Dict[str, str]]:
+    stress_score_by_week: Dict[str, int] = {}
+    risk_rank_by_week: Dict[str, int] = {}
+    risk_by_week: Dict[str, str] = {}
+
+    for info in study_guide.values():
+        weekly_metrics = info.get("weekly_metrics", {})
+        if not isinstance(weekly_metrics, dict):
+            continue
+        for week, metrics in weekly_metrics.items():
+            if not isinstance(metrics, dict):
+                continue
+            stress = int(metrics.get("weekly_stress_score") or 0)
+            risk = str(metrics.get("risk_level") or "Normal")
+            stress_score_by_week[week] = stress_score_by_week.get(week, 0) + stress
+
+            candidate_rank = RISK_LEVEL_ORDER.get(risk, 0)
+            current_rank = risk_rank_by_week.get(week, -1)
+            if candidate_rank > current_rank:
+                risk_rank_by_week[week] = candidate_rank
+                risk_by_week[week] = risk
+
+    return stress_score_by_week, risk_by_week
+
+
+def _collect_upcoming_exam_weight(study_guide: Dict[str, Dict[str, object]]) -> float:
+    today = date.today()
+    candidates: List[Tuple[date, float]] = []
+    for info in study_guide.values():
+        for assessment in info.get("upcoming_assessments", []):
+            if not isinstance(assessment, dict):
+                continue
+            kind = str(assessment.get("kind") or "").lower()
+            if kind != "exam":
+                continue
+            due_date = _parse_due_date(assessment.get("date"))
+            weight = assessment.get("weight_percent")
+            if due_date and due_date >= today and isinstance(weight, (int, float)):
+                candidates.append((due_date, float(weight)))
+    if not candidates:
+        return 0.0
+    candidates.sort(key=lambda item: item[0])
+    return candidates[0][1]
+
+
+def _render_kpis(
+    weekly_plan: Dict[str, List[Dict[str, object]]],
+    stress_score_by_week: Dict[str, int],
+    risk_by_week: Dict[str, str],
+    study_guide: Dict[str, Dict[str, object]],
+) -> None:
+    weeks_sorted = sorted(stress_score_by_week.keys(), key=_week_sort_key)
+    total_stress = sum(stress_score_by_week.values())
+    avg_stress = (total_stress / len(stress_score_by_week)) if stress_score_by_week else 0
+    peak_week = max(weeks_sorted, key=lambda w: stress_score_by_week.get(w, 0)) if weeks_sorted else "N/A"
+    peak_stress = stress_score_by_week.get(peak_week, 0) if weeks_sorted else 0
+    upcoming_exam_weight = _collect_upcoming_exam_weight(study_guide)
+
+    burnout_risk = "Normal"
+    if risk_by_week:
+        burnout_risk = max(
+            risk_by_week.values(),
+            key=lambda item: RISK_LEVEL_ORDER.get(item, 0),
+        )
+
+    if avg_stress >= 560:
+        stress_ai = "AI signal: sustained overload likely. Shift prep to earlier weeks."
+    elif avg_stress >= 360:
+        stress_ai = "AI signal: moderate pressure. Keep task batching tight."
+    else:
+        stress_ai = "AI signal: manageable pace. Protect consistency."
+
+    if peak_stress >= 650:
+        peak_ai = "AI signal: severe spike. Add recovery buffers before this week."
+    elif peak_stress >= 420:
+        peak_ai = "AI signal: concentrated workload. Pre-load key deliverables."
+    else:
+        peak_ai = "AI signal: peak is controlled with current sequencing."
+
+    if upcoming_exam_weight >= 30:
+        exam_ai = "AI signal: high-stakes exam incoming. Bias effort toward exam prep."
+    elif upcoming_exam_weight >= 20:
+        exam_ai = "AI signal: meaningful assessment ahead. Keep revision cadence active."
+    else:
+        exam_ai = "AI signal: no immediate heavy exam load detected."
+
+    if burnout_risk == "Critical Risk":
+        burnout_ai = "AI signal: burnout risk is critical. Reduce context switching now."
+    elif burnout_risk == "High Risk":
+        burnout_ai = "AI signal: burnout trend elevated. Protect sleep and focus blocks."
+    else:
+        burnout_ai = "AI signal: resilience level stable. Maintain current tempo."
+
+    kpi_data = [
+        ("AI Stress Intelligence", f"{avg_stress:.0f}", "Avg weekly stress score", stress_ai, False),
+        ("AI Peak Forecast", peak_week, f"Peak load: {peak_stress}", peak_ai, False),
+        ("AI Exam Pressure", f"{upcoming_exam_weight:.0f}%", "Nearest upcoming exam", exam_ai, False),
+        ("AI Burnout Risk", burnout_risk, f"{len(weekly_plan)} weeks scheduled", burnout_ai, burnout_risk in {"High Risk", "Critical Risk"}),
+    ]
+    cards_html = "".join(
+        (
+            f"<div class=\"glass-card interactive-card intel-card{' risk-red' if is_risk else ''}\">"
+            "<div class=\"ai-badge\">AI Insight</div>"
+            f"<div class=\"kpi-label\">{label}</div>"
+            f"<div class=\"kpi-value\">{value}</div>"
+            f"<div class=\"kpi-sub\">{sub}</div>"
+            f"<div class=\"kpi-ai\">{ai_text}</div>"
+            "</div>"
+        )
+        for label, value, sub, ai_text, is_risk in kpi_data
+    )
+    st.markdown(f"<div class=\"dashboard-grid\">{cards_html}</div>", unsafe_allow_html=True)
+
+
+def render_workload_chart(
+    stress_score_by_week: Dict[str, int],
+    risk_by_week: Dict[str, str],
+) -> None:
+    st.markdown('<div class="glass-card interactive-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Weekly Workload</div>', unsafe_allow_html=True)
+    if not stress_score_by_week:
+        st.info("No weekly stress data available yet.")
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
+
+    weeks = sorted(stress_score_by_week.keys(), key=_week_sort_key)
+    values = [stress_score_by_week.get(week, 0) for week in weeks]
+    if not weeks:
+        st.info("No weekly labels available.")
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
+
+    x_vals = list(range(len(weeks)))
+    avg_stress = sum(values) / len(values)
+    sustainable_limit = max(300.0, avg_stress * 1.15)
+
+    def _risk_state(week: str, value: float) -> str:
+        risk = str(risk_by_week.get(week, "Normal"))
+        if risk == "Critical Risk" or value >= sustainable_limit * 1.14:
+            return "high"
+        if risk == "High Risk" or value >= sustainable_limit * 0.94:
+            return "elevated"
+        return "normal"
+
+    state_colors = {
+        "normal": "#3FF5FF",
+        "elevated": "#FFA235",
+        "high": "#FF3E56",
+    }
+    states = [_risk_state(week, value) for week, value in zip(weeks, values)]
+
+    peak_index = max(range(len(values)), key=lambda idx: values[idx])
+    peak_week = weeks[peak_index]
+    peak_value = values[peak_index]
+    peak_x = x_vals[peak_index]
+
+    accel_threshold = max(28.0, avg_stress * 0.17)
+    accel_points = [
+        index
+        for index in range(1, len(values))
+        if (values[index] - values[index - 1]) >= accel_threshold
+    ]
+
+    fig = go.Figure()
+    # Edge fade for a cinematic glass look.
+    if x_vals:
+        fig.add_vrect(
+            x0=-0.5,
+            x1=0.22,
+            fillcolor="rgba(7, 15, 34, 0.46)",
+            line_width=0,
+            layer="above",
+        )
+        fig.add_vrect(
+            x0=x_vals[-1] - 0.22,
+            x1=x_vals[-1] + 0.5,
+            fillcolor="rgba(7, 15, 34, 0.46)",
+            line_width=0,
+            layer="above",
+        )
+
+    # Overload zone around peak week.
+    fig.add_shape(
+        type="rect",
+        xref="x",
+        yref="paper",
+        x0=peak_x - 0.45,
+        x1=peak_x + 0.45,
+        y0=0.0,
+        y1=1.0,
+        fillcolor="rgba(255, 92, 102, 0.22)",
+        line=dict(width=0),
+        layer="below",
+    )
+    # Faint top fade accent for overload band.
+    fig.add_shape(
+        type="rect",
+        xref="x",
+        yref="paper",
+        x0=peak_x - 0.45,
+        x1=peak_x + 0.45,
+        y0=0.78,
+        y1=1.0,
+        fillcolor="rgba(255, 92, 102, 0.14)",
+        line=dict(width=0),
+        layer="below",
+    )
+    fig.add_shape(
+        type="rect",
+        xref="x",
+        yref="paper",
+        x0=peak_x - 0.45,
+        x1=peak_x + 0.45,
+        y0=0.90,
+        y1=1.0,
+        fillcolor="rgba(255, 92, 102, 0.18)",
+        line=dict(width=0),
+        layer="below",
+    )
+    fig.add_annotation(
+        x=peak_x,
+        y=1.0,
+        yref="paper",
+        text="Overload Zone",
+        showarrow=False,
+        font=dict(color="#FFC0C6", size=11),
+    )
+
+    # Gradient area fill using layered low-opacity fills.
+    fig.add_trace(
+        go.Scatter(
+            x=x_vals,
+            y=values,
+            mode="lines",
+            line=dict(width=0),
+            fill="tozeroy",
+            fillcolor="rgba(95, 184, 255, 0.15)",
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=x_vals,
+            y=[value * 0.62 for value in values],
+            mode="lines",
+            line=dict(width=0),
+            fill="tozeroy",
+            fillcolor="rgba(81, 148, 255, 0.08)",
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+
+    # 3-layer line system: base glow, semi-glow, sharp top stroke.
+    fig.add_trace(
+        go.Scatter(
+            x=x_vals,
+            y=values,
+            mode="lines",
+            line=dict(color="rgba(112, 237, 255, 0.19)", width=30, shape="spline", smoothing=1.25),
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=x_vals,
+            y=values,
+            mode="lines",
+            line=dict(color="rgba(102, 226, 255, 0.34)", width=16, shape="spline", smoothing=1.25),
+            hoverinfo="skip",
+            showlegend=False,
+        )
+    )
+
+    for state, label in (("normal", "Normal"), ("elevated", "Elevated"), ("high", "High Risk")):
+        y_state = [value if state_name == state else None for value, state_name in zip(values, states)]
+        fig.add_trace(
+            go.Scatter(
+                x=x_vals,
+                y=y_state,
+                mode="lines+markers",
+                connectgaps=False,
+                line=dict(color=state_colors[state], width=5.3, shape="spline", smoothing=1.25),
+                marker=dict(
+                    size=9,
+                    color=state_colors[state],
+                    line=dict(color="rgba(255,255,255,0.38)", width=1),
+                ),
+                customdata=[[week] for week in weeks],
+                hovertemplate="%{customdata[0]}<br>Stress: %{y:.0f}<extra>" + label + "</extra>",
+                name=label,
+            )
+        )
+
+    # Acceleration arrows where stress ramps rapidly.
+    if accel_points:
+        fig.add_trace(
+            go.Scatter(
+                x=[x_vals[idx] for idx in accel_points],
+                y=[values[idx] + max(8.0, values[idx] * 0.04) for idx in accel_points],
+                mode="markers",
+                marker=dict(
+                    symbol="triangle-up",
+                    size=10,
+                    color="#FFD27D",
+                    line=dict(color="#FFEAC2", width=1),
+                ),
+                customdata=[[weeks[idx], values[idx] - values[idx - 1]] for idx in accel_points],
+                hovertemplate="%{customdata[0]}<br>Stress acceleration: +%{customdata[1]:.0f}<extra></extra>",
+                name="Acceleration",
+            )
+        )
+
+    # Sustainable threshold line.
+    fig.add_hline(
+        y=sustainable_limit,
+        line=dict(color="rgba(136, 188, 255, 0.46)", width=0.9, dash="dot"),
+        annotation_text="Sustainable Limit",
+        annotation_position="top left",
+        annotation_font=dict(color="#C8DDFF", size=11),
+    )
+
+    # Peak highlight with pulse-like layered markers.
+    fig.add_trace(
+        go.Scatter(
+            x=[peak_x],
+            y=[peak_value],
+            mode="markers",
+            marker=dict(size=42, color="rgba(145, 246, 255, 0.16)", line=dict(width=0)),
+            showlegend=False,
+            hoverinfo="skip",
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=[peak_x],
+            y=[peak_value],
+            mode="markers",
+            marker=dict(size=24, color="rgba(157, 247, 255, 0.34)", line=dict(width=0)),
+            showlegend=False,
+            hoverinfo="skip",
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=[peak_x],
+            y=[peak_value],
+            mode="markers",
+            marker=dict(size=12, color="#D8FBFF", line=dict(color="#FFFFFF", width=2.0)),
+            showlegend=False,
+            customdata=[[peak_week]],
+            hovertemplate="Peak week: %{customdata[0]}<br>Stress: %{y:.0f}<extra></extra>",
+        )
+    )
+    fig.add_annotation(
+        x=peak_x,
+        y=peak_value,
+        text=f"Peak: {peak_week} ({peak_value})",
+        showarrow=True,
+        arrowhead=2,
+        arrowsize=1,
+        arrowwidth=1,
+        arrowcolor="rgba(177, 216, 255, 0.62)",
+        ax=0,
+        ay=-52,
+        font=dict(color="#E8F6FF", size=12),
+        bgcolor="rgba(14, 28, 58, 0.82)",
+        bordercolor="rgba(169, 206, 255, 0.45)",
+        borderwidth=1,
+        borderpad=6,
+    )
+
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        margin=dict(l=8, r=10, t=16, b=8),
+        height=350,
+        yaxis_title="Stress / Load Score",
+        xaxis_title="Week",
+        hovermode="x unified",
+        legend=dict(orientation="h", yanchor="bottom", y=1.03, xanchor="left", x=0, borderwidth=0),
+        font=dict(color="#DDE9FF"),
+        hoverlabel=dict(
+            bgcolor="rgba(12, 24, 54, 0.92)",
+            bordercolor="rgba(136, 188, 255, 0.44)",
+            font=dict(color="#E8F4FF", size=12),
+        ),
+    )
+    fig.update_yaxes(
+        gridcolor="rgba(160, 196, 255, 0.11)",
+        griddash="dot",
+        zeroline=False,
+        gridwidth=1,
+    )
+    fig.update_xaxes(
+        tickmode="array",
+        tickvals=x_vals,
+        ticktext=weeks,
+        gridcolor="rgba(160, 196, 255, 0.08)",
+        griddash="dot",
+        zeroline=False,
+    )
+    st.markdown(
+        "<div style='font-size:0.74rem;color:#AFC8FF;margin-bottom:0.2rem;'>AI Structural Load Analysis</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown('<div class="workload-plot">', unsafe_allow_html=True)
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False, "responsive": True},
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown(
+        "<div style='font-size:0.76rem;color:#AFC8FF;margin-top:-0.15rem;'>AI detected stress acceleration before peak.</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def render_grading_chart(study_guide: Dict[str, Dict[str, object]]) -> None:
+    st.markdown('<div class="glass-card interactive-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Grading Distribution by Course</div>', unsafe_allow_html=True)
+    course_distributions: Dict[str, Dict[str, float]] = {}
+    for course_name, info in study_guide.items():
+        grading_breakdown = info.get("grading_breakdown", {})
+        if not isinstance(grading_breakdown, dict):
+            continue
+        clean = {
+            str(label).strip() or "Other": float(weight)
+            for label, weight in grading_breakdown.items()
+            if isinstance(weight, (int, float)) and float(weight) > 0
+        }
+        if clean:
+            course_distributions[course_name] = clean
+
+    if not course_distributions:
+        st.info("No grading distribution data available.")
+        st.markdown("</div>", unsafe_allow_html=True)
+        return
+
+    st.caption("AI Weight Sensitivity Model")
+    course_names = list(course_distributions.keys())
+    selected_course = st.selectbox(
+        "Course",
+        course_names,
+        label_visibility="collapsed",
+        key="grading_course_selector",
+    )
+    distribution = course_distributions[selected_course]
+    labels = list(distribution.keys())
+    values = list(distribution.values())
+    total_weight = sum(values)
+    max_weight = max(values) if values else 1.0
+    impact_scores = [(value / max_weight) * 100.0 for value in values]
+    customdata = [[value, impact] for value, impact in zip(values, impact_scores)]
+    colors = [NEON_CHART_COLORS[i % len(NEON_CHART_COLORS)] for i in range(len(labels))]
+
+    fig = go.Figure(
+        data=[
+            go.Pie(
+                labels=labels,
+                values=values,
+                hole=0.68,
+                textinfo="percent",
+                textposition="inside",
+                insidetextfont=dict(size=12, color="#F4FAFF"),
+                marker=dict(colors=colors, line=dict(color="rgba(11,22,44,0.96)", width=2)),
+                sort=False,
+                pull=[0.014] * len(labels),
+                customdata=customdata,
+                hovertemplate=(
+                    "<b>%{label}</b><br>"
+                    "Weight: %{customdata[0]:.1f}%<br>"
+                    "Relative Impact: %{customdata[1]:.0f}<extra></extra>"
+                ),
+            )
+        ]
+    )
+    # Soft radial glow + subtle lighting layers behind donut.
+    fig.add_shape(
+        type="circle",
+        xref="paper",
+        yref="paper",
+        x0=0.13,
+        y0=0.13,
+        x1=0.87,
+        y1=0.87,
+        fillcolor="rgba(92, 150, 255, 0.066)",
+        line=dict(width=0),
+        layer="below",
+    )
+    fig.add_shape(
+        type="circle",
+        xref="paper",
+        yref="paper",
+        x0=0.21,
+        y0=0.21,
+        x1=0.79,
+        y1=0.79,
+        fillcolor="rgba(138, 196, 255, 0.03)",
+        line=dict(width=0),
+        layer="below",
+    )
+    fig.add_annotation(
+        text=f"<b>{selected_course}</b><br>Total Weight {total_weight:.0f}%",
+        x=0.5,
+        y=0.5,
+        showarrow=False,
+        font=dict(color="#EAF4FF", size=12),
+    )
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        margin=dict(l=10, r=10, t=16, b=10),
+        height=340,
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.12,
+            xanchor="center",
+            x=0.5,
+            font=dict(color="#CFE0FF", size=11),
+            bgcolor="rgba(0,0,0,0)",
+            borderwidth=0,
+        ),
+        font=dict(color="#DDE9FF"),
+        transition=dict(duration=420, easing="cubic-in-out"),
+        hoverlabel=dict(
+            bgcolor="rgba(12, 24, 54, 0.92)",
+            bordercolor="rgba(160, 204, 255, 0.38)",
+            font=dict(color="#E8F4FF", size=12),
+        ),
+    )
+    st.plotly_chart(
+        fig,
+        use_container_width=True,
+        config={"displayModeBar": False, "responsive": True},
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def _render_ai_strategy_card(
+    weekly_plan: Dict[str, List[Dict[str, object]]],
+    stress_score_by_week: Dict[str, int],
+    risk_by_week: Dict[str, str],
+    study_guide: Dict[str, Dict[str, object]],
+) -> None:
+    st.markdown('<div class="glass-card interactive-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">AI Strategy</div>', unsafe_allow_html=True)
+
+    weeks_sorted = sorted(stress_score_by_week.keys(), key=_week_sort_key)
+    peak_week = max(weeks_sorted, key=lambda w: stress_score_by_week.get(w, 0)) if weeks_sorted else None
+    peak_risk = risk_by_week.get(peak_week, "Normal") if peak_week else "Normal"
+
+    tactics: List[str] = []
+    warnings: List[str] = []
+    for info in study_guide.values():
+        tactics.extend([str(item) for item in info.get("tactical_tips", []) if isinstance(item, str)])
+        warnings.extend([str(item) for item in info.get("warnings", []) if isinstance(item, str)])
+
+    tactic_text = " ".join(tactics[:2]) if tactics else "Focus first on the nearest high-weight assessments."
+    warning_text = warnings[0] if warnings else "No immediate structural grading issues detected."
+
+    st.markdown(
+        (
+            f"**Execution focus:** Prioritize tasks in **{peak_week or 'the earliest active week'}** "
+            f"where risk is **{peak_risk}**. Maintain daily progress on high-priority tasks and "
+            f"avoid deferring exam preparation to the last week."
+        )
+    )
+    st.markdown(f"**Tactical note:** {tactic_text}")
+    st.markdown(f"**Guardrail:** {warning_text}")
+    st.markdown(f"**Plan coverage:** {sum(len(tasks) for tasks in weekly_plan.values())} scheduled tasks.")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def _render_ai_insight_panel(
+    weekly_plan: Dict[str, List[Dict[str, object]]],
+    stress_score_by_week: Dict[str, int],
+    risk_by_week: Dict[str, str],
+    study_guide: Dict[str, Dict[str, object]],
+) -> None:
+    weeks_sorted = sorted(stress_score_by_week.keys(), key=_week_sort_key)
+    burnout_risk = "Normal"
+    if risk_by_week:
+        burnout_risk = max(risk_by_week.values(), key=lambda item: RISK_LEVEL_ORDER.get(item, 0))
+    hot_weeks = sum(1 for risk in risk_by_week.values() if risk in {"High Risk", "Critical Risk"})
+    total_tasks = sum(len(tasks) for tasks in weekly_plan.values())
+    max_stress = max(stress_score_by_week.values()) if stress_score_by_week else 0
+    peak_week = max(weeks_sorted, key=lambda w: stress_score_by_week.get(w, 0)) if weeks_sorted else "N/A"
+
+    upcoming_exam_weight = _collect_upcoming_exam_weight(study_guide)
+    strategic_move = "Maintain steady execution across weekly priorities."
+    if burnout_risk == "Critical Risk":
+        strategic_move = "Aggressively front-load exam prep and reduce parallel project load."
+    elif burnout_risk == "High Risk":
+        strategic_move = "Create workload buffers before the peak week and lock deep-work blocks."
+    elif upcoming_exam_weight >= 25:
+        strategic_move = "Reallocate study time toward high-weight exam preparation now."
+
+    risk_class = " risk-red" if burnout_risk in {"High Risk", "Critical Risk"} else ""
+    st.markdown(f'<div class="glass-card interactive-card intel-card{risk_class}">', unsafe_allow_html=True)
+    st.markdown('<div class="ai-badge">AI Workload Signal</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">AI Insight Panel</div>', unsafe_allow_html=True)
+    st.markdown(
+        (
+            f"**Risk posture:** {burnout_risk} across **{len(stress_score_by_week)} active weeks** "
+            f"with **{hot_weeks} high-pressure weeks** detected."
+        )
+    )
+    st.markdown(
+        f"**Peak stress event:** {peak_week} at **{max_stress} stress points** across **{total_tasks} scheduled tasks**."
+    )
+    st.markdown(f"**Recommended AI move:** {strategic_move}")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+def _render_raw_outputs(
+    weekly_plan: Dict[str, List[Dict[str, object]]],
+    study_guide: Dict[str, Dict[str, object]],
+) -> None:
+    with st.expander("Detailed Weekly Plan", expanded=False):
+        for week in sorted(weekly_plan.keys(), key=_week_sort_key):
+            st.markdown(f"**{week}**")
+            rows = []
+            for task in weekly_plan[week]:
+                rows.append(
+                    {
+                        "Course": task.get("course", ""),
+                        "Task": task.get("task", ""),
+                        "Priority": task.get("priority", ""),
+                        "Due": task.get("due") or "",
+                        "Est. minutes": task.get("estimated_minutes", ""),
+                    }
+                )
+            if rows:
+                st.table(rows)
+    with st.expander("Study Guide Detail", expanded=False):
+        st.json(study_guide)
+
+
+def main() -> None:
+    st.set_page_config(page_title="Syllabus-to-Action Dashboard", page_icon=":bar_chart:", layout="wide")
+    _inject_styles()
+
+    st.markdown(
+        """
+        <div class="hero-header">
+            <div class="app-title">Syllabus-to-Action Dashboard</div>
+            <div class="app-subtitle">
+                SaaS-style workload intelligence powered by deterministic planning and optional AI refinement.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    syllabus_inputs, use_ai, generate_clicked = _render_input_panel()
+
+    if not generate_clicked:
+        st.info("Paste syllabus text and click Generate Dashboard.")
+        return
+
+    ai_engine.USE_REAL_AI = use_ai
+    parsed_syllabi = parse_syllabi([text for text in syllabus_inputs if text.strip()])
+    weekly_plan = generate_weekly_plan(parsed_syllabi)
+    anchor_date = date.today()
+    result = generate_plan_with_ai(
+        parsed_syllabi,
+        weekly_plan,
+        anchor_date=anchor_date,
+    )
+    weekly_plan = result.get("weekly_plan", {})
+    study_guide = result.get("study_guide", {})
+    stress_score_by_week, risk_by_week = _aggregate_weekly_risk_and_stress(study_guide)
+
+    _render_kpis(weekly_plan, stress_score_by_week, risk_by_week, study_guide)
+    chart_col_1, chart_col_2 = st.columns(2, gap="large")
+    with chart_col_1:
+        render_workload_chart(stress_score_by_week, risk_by_week)
+    with chart_col_2:
+        render_grading_chart(study_guide)
+    _render_ai_insight_panel(weekly_plan, stress_score_by_week, risk_by_week, study_guide)
+    _render_ai_strategy_card(weekly_plan, stress_score_by_week, risk_by_week, study_guide)
+    _render_raw_outputs(weekly_plan, study_guide)
+
+
+if __name__ == "__main__":
+    main()

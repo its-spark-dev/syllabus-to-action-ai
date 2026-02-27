@@ -1,6 +1,11 @@
 # Changelog
 
 ## [Unreleased]
+- Added `dashboard_app.py` as a dedicated premium SaaS dashboard UI while preserving existing engine/business outputs (`weekly_plan`, `study_guide`, `weekly_metrics`).
+- Integrated Plotly-based analytics visuals (weekly workload intelligence line chart and per-course grading donut chart) with dark glass styling and responsive rendering.
+- Upgraded chart intelligence UX: peak-week overload highlighting, sustainable threshold detection, stress-acceleration signals, and AI-oriented annotations/tooltips.
+- Added dynamic grading-impact visualization controls with course switching and center-weight labels for faster comparative course analysis.
+- Added `plotly` to project dependencies in `requirements.txt`.
 - Pre-AI stabilization freeze completed: deterministic-only execution path documented and consolidated for a clean baseline snapshot.
 - Deterministic anchor-date contract enforced: `generate_plan_with_ai` now requires `anchor_date` to eliminate runtime date drift and ensure stable scheduling behavior.
 - UI-facing weight display contract tightened: only explicit assessment weights are shown in tasks/upcoming items; distributed/internal weights remain scoring-only and `None%` display is removed.
