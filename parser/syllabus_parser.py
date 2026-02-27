@@ -56,20 +56,23 @@ DATE_PATTERNS = [
 ]
 
 COURSE_CODE_PATTERN = re.compile(r"\b[A-Z]{2,4}\s?\d{3,4}[A-Z]?\b")
-# Weight patterns like "(25%)", "25%", "worth 10%", "accounts for 15%".
-WEIGHT_PATTERN = re.compile(
-    r"(?:\(|\b)(?P<percent>\d{1,3})\s*%(?:\)|\b)",
-    flags=re.IGNORECASE,
-)
-WEIGHT_PHRASE_PATTERN = re.compile(
-    r"\b(?:worth|accounts\s+for|accounting\s+for)\s+(?P<percent>\d{1,3})\s*%",
-    flags=re.IGNORECASE,
-)
-# Grading breakdown lines like "Homework Assignments (8 total) – 20%".
+# Weight extraction uses percentage forms like "25%" or "25.5%".
+WEIGHT_EXTRACT_PATTERN = re.compile(r"(\d+(?:\.\d+)?)\s*%")
+# Grading breakdown lines like "Homework - 20% (weekly)".
 GRADING_CATEGORY_PATTERN = re.compile(
-    r"^(?P<label>.+?)\s*[:–-]\s*(?P<percent>\d{1,3})\s*%$",
+    r"^(?P<label>.+?)\s*[:\-]\s*(?P<percent>\d+(?:\.\d+)?)\s*%(?:\s*\([^)]*\))?\s*$",
     flags=re.IGNORECASE,
 )
+
+
+def normalize_syllabus_text(text: str) -> str:
+    normalized_lines: List[str] = []
+    for raw_line in text.splitlines():
+        line = raw_line.replace("–", "-").replace("—", "-")
+        line = re.sub(r"(\d+(?:\.\d+)?)\s+%", r"\1%", line)
+        line = re.sub(r"[ \t]+", " ", line).strip()
+        normalized_lines.append(line)
+    return "\n".join(normalized_lines)
 
 
 def _normalize(text: str) -> str:
@@ -103,6 +106,12 @@ def get_course_name(lines: List[str]) -> Optional[str]:
         line_clean = _normalize(line)
         if not line_clean:
             continue
+        header_match = re.match(r"^course\s*:\s*(.+)$", line_clean, flags=re.IGNORECASE)
+        if header_match:
+            course_value = _normalize(header_match.group(1))
+            if course_value:
+                return course_value
+            continue
         lowered = line_clean.lower()
         has_assessment = any(
             keyword in lowered for keyword in ("midterm", "final", "quiz", "project")
@@ -115,13 +124,21 @@ def get_course_name(lines: List[str]) -> Optional[str]:
 
 
 def _extract_weight(text: str) -> Optional[float]:
-    match = WEIGHT_PHRASE_PATTERN.search(text)
+    match = WEIGHT_EXTRACT_PATTERN.search(text)
     if match:
-        return float(match.group("percent"))
-    match = WEIGHT_PATTERN.search(text)
-    if match:
-        return float(match.group("percent"))
+        return float(match.group(1))
     return None
+
+
+def _extract_grading_category(text: str) -> Optional[Tuple[str, float]]:
+    match = GRADING_CATEGORY_PATTERN.match(text)
+    if not match:
+        return None
+    label = re.sub(r"\s*\([^)]*\)", "", match.group("label"))
+    label = _normalize(label)
+    if not label:
+        return None
+    return label, float(match.group("percent"))
 
 
 def _classify_kind(text: str) -> str:
@@ -147,15 +164,16 @@ def _has_assessment_keyword(text: str) -> bool:
 
 
 def _title_from_line(text: str) -> str:
-    cleaned = WEIGHT_PHRASE_PATTERN.sub("", text)
-    cleaned = re.sub(r"\(?\s*\d{1,3}\s*%\s*\)?", "", cleaned)
+    cleaned = WEIGHT_EXTRACT_PATTERN.sub("", text)
+    cleaned = re.sub(r"\b(?:worth|accounts\s+for|accounting\s+for)\b", "", cleaned, flags=re.IGNORECASE)
     for pattern in DATE_PATTERNS:
         cleaned = re.sub(pattern, "", cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r"\b(due|due on)\b", "", cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r"[()]+", "", cleaned)
     if ":" in cleaned:
         cleaned = cleaned.split(":", 1)[0]
-    cleaned = re.sub(r"\s*[-–|]\s*$", "", cleaned)
+    cleaned = re.sub(r"\s*[-|]\s*$", "", cleaned)
+    cleaned = re.sub(r"[-\s]+$", "", cleaned)
     return _normalize(cleaned)
 
 
@@ -180,12 +198,12 @@ def parse_syllabi(syllabi_texts: List[str]) -> List[Dict[str, object]]:
     for course_index, syllabus_text in enumerate(syllabi_texts, start=1):
         if not syllabus_text:
             continue
+        syllabus_text = normalize_syllabus_text(syllabus_text)
 
         course_id = f"course_{course_index}"
         course = _extract_course(syllabus_text) or "Unknown Course"
         in_grading_breakdown = False
         grading_categories: Dict[str, float] = {}
-        course_tasks: List[Dict[str, object]] = []
 
         for line in syllabus_text.splitlines():
             line_clean = _normalize(line)
@@ -216,14 +234,10 @@ def parse_syllabi(syllabi_texts: List[str]) -> List[Dict[str, object]]:
 
             # Capture grading breakdown categories without creating tasks.
             if in_grading_breakdown and not date:
-                match = GRADING_CATEGORY_PATTERN.match(line_clean)
-                if match:
-                    label = match.group("label")
-                    label = re.sub(r"\s*\([^)]*\)", "", label)
-                    label = _normalize(label)
-                    percent = float(match.group("percent"))
-                    if label:
-                        grading_categories[label] = percent
+                category = _extract_grading_category(line_clean)
+                if category:
+                    label, percent = category
+                    grading_categories[label] = percent
                     continue
             if (
                 weight is not None
@@ -244,10 +258,6 @@ def parse_syllabi(syllabi_texts: List[str]) -> List[Dict[str, object]]:
                     "weight_percent": weight,
                 }
                 results.append(task)
-                course_tasks.append(task)
-
-        print("DEBUG tasks:", course_tasks)
-        print("DEBUG grading_categories:", grading_categories)
         _append_grading_categories(results, course_id, course, grading_categories)
 
     return results

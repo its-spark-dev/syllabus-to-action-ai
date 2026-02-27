@@ -17,6 +17,10 @@ DATE_FORMATS = (
 )
 
 
+def _remove_trailing_punctuation(value: str) -> str:
+    return re.sub(r"[^\w\s]+$", "", value)
+
+
 def _parse_date(date_str: str, default_year: Optional[int] = None) -> Optional[date]:
     cleaned = date_str.strip()
     for fmt in DATE_FORMATS:
@@ -56,9 +60,13 @@ def _due_soon_score(days_until_due: Optional[int]) -> int:
     if days_until_due is None:
         return 0
     if days_until_due <= 3:
-        return 30
+        return 50
     if days_until_due <= 7:
-        return 20
+        return 35
+    if days_until_due <= 14:
+        return 25
+    if days_until_due <= 21:
+        return 15
     return 0
 
 
@@ -68,6 +76,37 @@ def _priority_rank(priority: str) -> int:
     if priority == "Med":
         return 1
     return 2
+
+
+def _priority_from_score(score: float, weight_for_priority: float) -> str:
+    if score >= 75:
+        priority = "High"
+    elif score >= 50:
+        priority = "Med"
+    else:
+        priority = "Low"
+
+    if weight_for_priority >= 30:
+        return "High"
+    if weight_for_priority >= 20 and priority == "Low":
+        return "Med"
+    return priority
+
+
+def _priority_level(priority: str) -> int:
+    if priority == "High":
+        return 2
+    if priority == "Med":
+        return 1
+    return 0
+
+
+def _priority_from_level(level: int) -> str:
+    if level >= 2:
+        return "High"
+    if level == 1:
+        return "Med"
+    return "Low"
 
 
 def _build_summary(
@@ -159,7 +198,7 @@ def _compute_priority_score(
     if kind == "exam" and not is_prep:
         score += 25
     if is_prep:
-        score -= 20
+        score -= 10
 
     if kind == "homework" and (days_until_due is None or days_until_due > 5):
         score = min(score, 60)
@@ -255,9 +294,12 @@ def _dedup_key(task: Dict[str, object]) -> Tuple[object, object, object]:
 
 
 def normalize_title(title: str) -> str:
-    cleaned = title.lower()
+    cleaned = title.strip().lower()
+    cleaned = re.sub(r"\s+", " ", cleaned)
+    cleaned = re.sub(r"[-–—:|,.;!?]+\s*$", "", cleaned)
     cleaned = re.sub(r"\b(the|exam|final)\b", "", cleaned)
     cleaned = re.sub(r"\s+", " ", cleaned)
+    cleaned = _remove_trailing_punctuation(cleaned)
     return cleaned.strip()
 
 
@@ -301,10 +343,12 @@ def deterministic_ai_refinement(
 
     item_lookup: Dict[Tuple[str, str], Dict[str, object]] = {}
     for course_name, items in courses.items():
+        normalized_course_name = str(course_name).strip()
         for item in items:
-            title = item.get("title") or ""
-            if title:
-                item_lookup[(course_name, title)] = item
+            title = str(item.get("title") or "")
+            normalized_item_title = normalize_title(title)
+            if normalized_item_title:
+                item_lookup[(normalized_course_name, normalized_item_title)] = item
 
     distributed_weights_by_course: Dict[str, Dict[Tuple[str, str], float]] = {}
     grading_categories_by_course: Dict[str, Dict[str, float]] = {}
@@ -337,7 +381,9 @@ def deterministic_ai_refinement(
             raw_title = title_part or task
             is_prep = raw_title.lower().startswith("prep for ")
             title = raw_title[9:] if is_prep else raw_title
-            item = item_lookup.get((course_name, title))
+            normalized_course_name = course_name.strip()
+            normalized_lookup_title = normalize_title(title)
+            item = item_lookup.get((normalized_course_name, normalized_lookup_title))
 
             kind = "other"
             date_str = None
@@ -361,18 +407,25 @@ def deterministic_ai_refinement(
             category_label = None
             category_weight = 0.0
             distributed_weight = 0.0
-            if item and course_name in grading_categories_by_course:
-                category_label, category_weight = _category_info_for_item(
-                    grading_categories_by_course[course_name],
-                    item,
-                )
-                distributed_weight = distributed_weights_by_course.get(course_name, {}).get(
-                    (course_name, title),
-                    0.0,
-                )
+            if item:
+                matched_course_name = str(item.get("course") or course_name)
+                matched_title = str(item.get("title") or title)
+                if matched_course_name in grading_categories_by_course:
+                    category_label, category_weight = _category_info_for_item(
+                        grading_categories_by_course[matched_course_name],
+                        item,
+                    )
+                    distributed_weight = distributed_weights_by_course.get(
+                        matched_course_name,
+                        {},
+                    ).get(
+                        (matched_course_name, matched_title),
+                        0.0,
+                    )
             weight_for_priority = explicit_weight if explicit_weight > 0 else distributed_weight
             display_weight = 0.0 if is_prep else explicit_weight
             weight_effective = 0.0 if is_prep else weight_for_priority
+            real_assessment_priority: Optional[str] = None
             priority_score = _compute_priority_score(
                 weight_for_priority,
                 days_until_due,
@@ -389,13 +442,17 @@ def deterministic_ai_refinement(
                     False,
                 )
                 priority_score = min(priority_score, real_assessment_score - 1.0)
+                real_assessment_priority = _priority_from_score(
+                    real_assessment_score,
+                    weight_for_priority,
+                )
 
-            if priority_score >= 75:
-                priority = "High"
-            elif priority_score >= 50:
-                priority = "Med"
-            else:
-                priority = "Low"
+            priority = _priority_from_score(priority_score, weight_for_priority)
+            if is_prep and real_assessment_priority:
+                prep_level = _priority_level(priority)
+                real_level = _priority_level(real_assessment_priority)
+                if real_level - prep_level > 1:
+                    priority = _priority_from_level(real_level - 1)
 
             exam_guard = (
                 kind == "exam"
@@ -721,20 +778,20 @@ def call_ibm_ai(
 
     try:
         from ibm_watsonx_ai import Credentials
-        from ibm_watsonx_ai.foundation_models import Model
+        from ibm_watsonx_ai.foundation_models import ModelInference
 
         credentials = Credentials(
             api_key=os.environ["WATSONX_API_KEY"],
             url=os.environ["WATSONX_URL"],
         )
-        model = Model(
-            model_id="granite-13b-instruct-v2",
+        model = ModelInference(
+            model_id="ibm/granite-4-h-small",
             credentials=credentials,
             project_id=os.environ["WATSONX_PROJECT_ID"],
         )
-        response = model.generate_text(
+        response = model.generate(
             prompt=prompt,
-            parameters={
+            params={
                 "max_new_tokens": 1200,
                 "temperature": 0.2,
             },
@@ -746,13 +803,17 @@ def call_ibm_ai(
     def _parse_model_output(text: str) -> Optional[Dict[str, object]]:
         if not text:
             return None
+        cleaned_text = text.strip()
+        if cleaned_text.startswith("```"):
+            cleaned_text = re.sub(r"^```(?:json)?\s*", "", cleaned_text, flags=re.IGNORECASE)
+            cleaned_text = re.sub(r"\s*```$", "", cleaned_text)
         try:
-            return json.loads(text)
+            return json.loads(cleaned_text)
         except json.JSONDecodeError:
             pass
 
         # Try to extract a JSON object from a larger response.
-        match = re.search(r"\{.*\}", text, flags=re.DOTALL)
+        match = re.search(r"\{.*\}", cleaned_text, flags=re.DOTALL)
         if match:
             try:
                 return json.loads(match.group(0))

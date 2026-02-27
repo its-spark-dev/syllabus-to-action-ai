@@ -7,7 +7,7 @@ from pprint import pprint
 from typing import Any
 
 from ibm_watsonx_ai import Credentials
-from ibm_watsonx_ai.foundation_models import Model
+from ibm_watsonx_ai.foundation_models import ModelInference
 
 
 def extract_text(response: Any) -> str:
@@ -51,25 +51,46 @@ def main() -> int:
             api_key=os.environ["WATSONX_API_KEY"],
             url=os.environ["WATSONX_URL"],
         )
-        model = Model(
-            model_id="granite-13b-instruct-v2",
+        model = ModelInference(
+            model_id="ibm/granite-4-h-small",
             credentials=credentials,
             project_id=os.environ["WATSONX_PROJECT_ID"],
         )
 
-        prompt = 'Return JSON: {"test": "ok"}'
-        response = model.generate_text(
-            prompt=prompt,
-            parameters={
-                "max_new_tokens": 1200,
-                "temperature": 0.2,
-            },
-        )
+        prompt = """
+You are an AI that returns structured JSON.
+
+Return a valid JSON object with this schema:
+
+{
+"status": "string",
+"confidence": "number"
+}
+
+Return ONLY JSON.
+Do not include markdown or explanations.
+"""
+        params = {
+            "max_new_tokens": 150,
+            "temperature": 0.2,
+        }
+        response = model.generate(prompt=prompt, params=params)
 
         print("Raw response:")
         pprint(response)
         print("\nExtracted text:")
-        print(extract_text(response))
+        generated_text = extract_text(response)
+        print(generated_text)
+
+        import re
+        import json
+
+        match = re.search(r"{.*}", generated_text, flags=re.DOTALL)
+        if match:
+            parsed = json.loads(match.group())
+            print("Parsed JSON:", parsed)
+        else:
+            print("No valid JSON found.")
         return 0
     except Exception as exc:
         print(f"WatsonX connectivity test failed: {exc.__class__.__name__}: {exc}")
