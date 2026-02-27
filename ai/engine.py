@@ -1095,6 +1095,10 @@ def _derive_acceleration_and_compression_risk(
     peak_week: str,
 ) -> Tuple[float, float]:
     if not weekly_metrics:
+        logger.debug(
+            "AI KPI binding debug: peak_week=%s acceleration_index=0.0 compression_risk=0.0 (no weekly_metrics)",
+            peak_week,
+        )
         return 0.0, 0.0
 
     acceleration_index = max(
@@ -1117,9 +1121,184 @@ def _derive_acceleration_and_compression_risk(
     compression_window_days = float(peak_data.get("compression_window_days") or 0.0)
 
     # compression_risk is derived strictly from peak-week weekly_metrics values.
-    raw_compression_risk = compression_weight_percent * max(0.0, compression_window_days)
-    compression_risk = min(100.0, max(0.0, raw_compression_risk / 5.0))
-    return round(acceleration_index, 1), round(compression_risk, 1)
+    compression_risk = max(0.0, compression_weight_percent * max(0.0, compression_window_days))
+    acceleration_index = round(acceleration_index, 1)
+    compression_risk = round(compression_risk, 1)
+
+    logger.debug(
+        "AI KPI binding debug: peak_week=%s acceleration_index=%.1f compression_risk=%.1f",
+        peak_label,
+        acceleration_index,
+        compression_risk,
+    )
+    print(
+        f"[AI KPI DEBUG] peak_week={peak_label} "
+        f"acceleration_index={acceleration_index:.1f} compression_risk={compression_risk:.1f}"
+    )
+    return acceleration_index, compression_risk
+
+
+def compute_ai_intelligence(
+    summary_json: Dict[str, object],
+    metrics: Optional[Dict[str, object]] = None,
+    weekly_metrics: Optional[Dict[str, Dict[str, object]]] = None,
+) -> Dict[str, object]:
+    if not isinstance(weekly_metrics, dict):
+        if isinstance(metrics, dict):
+            weekly_metrics = _aggregate_weekly_metrics(metrics.get("study_guide", {}))
+        else:
+            weekly_metrics = {}
+
+    if not weekly_metrics:
+        return {
+            "stress_score": 0.0,
+            "acceleration_index": 0.0,
+            "burnout_probability": 0.0,
+            "structural_overload": False,
+            "alert_level": "Normal",
+            "insights": [
+                "No weekly metrics were detected, so structural risk inference is limited.",
+            ],
+            "strategy": [
+                "Provide more complete dated assessments to improve stress and compression modeling.",
+            ],
+            "confidence": 15.0,
+        }
+
+    peak_week = str(summary_json.get("peak_week") or "")
+    if peak_week and peak_week not in weekly_metrics:
+        logger.warning(
+            "AI intelligence: peak_week '%s' not found in weekly_metrics; using highest-stress week fallback.",
+            peak_week,
+        )
+
+    if peak_week in weekly_metrics:
+        peak_label = peak_week
+    else:
+        peak_label = max(
+            weekly_metrics.keys(),
+            key=lambda week: float(weekly_metrics[week].get("weekly_stress_score") or 0.0),
+        )
+
+    peak_data = weekly_metrics.get(peak_label, {})
+    peak_week_stress_score = float(peak_data.get("weekly_stress_score") or 0.0)
+    compression_weight_percent = float(peak_data.get("compression_weight_percent") or 0.0)
+    compression_window_days = float(peak_data.get("compression_window_days") or 0.0)
+
+    stress_values = [float(data.get("weekly_stress_score") or 0.0) for data in weekly_metrics.values()]
+    p85_stress = _percentile(stress_values, 85.0)
+    acceleration_index, compression_risk = _derive_acceleration_and_compression_risk(
+        weekly_metrics,
+        peak_week,
+    )
+
+    if p85_stress > 0:
+        stress_score = min(100.0, (peak_week_stress_score / p85_stress) * 100.0)
+    else:
+        stress_score = min(100.0, peak_week_stress_score)
+    stress_score = round(max(0.0, stress_score), 1)
+
+    acceleration_component = min(100.0, max(0.0, acceleration_index))
+    compression_component = min(100.0, max(0.0, compression_weight_percent))
+    burnout_probability = round(
+        min(
+            100.0,
+            max(0.0, (stress_score * 0.5) + (acceleration_component * 0.3) + (compression_component * 0.2)),
+        ),
+        1,
+    )
+
+    assessment_dates: List[date] = []
+    if isinstance(metrics, dict):
+        study_guide = metrics.get("study_guide", {})
+    else:
+        study_guide = {}
+    if isinstance(study_guide, dict):
+        for info in study_guide.values():
+            if not isinstance(info, dict):
+                continue
+            upcoming = info.get("upcoming_assessments", [])
+            if not isinstance(upcoming, list):
+                continue
+            for assessment in upcoming:
+                if not isinstance(assessment, dict):
+                    continue
+                weight = assessment.get("weight_percent")
+                date_str = assessment.get("date")
+                if not isinstance(weight, (int, float)) or float(weight) < 10.0:
+                    continue
+                if not isinstance(date_str, str) or not date_str:
+                    continue
+                parsed = _parse_date(date_str, default_year=date.today().year)
+                if isinstance(parsed, date):
+                    assessment_dates.append(parsed)
+    assessment_dates.sort()
+
+    max_assessments_in_10_days = 0
+    left = 0
+    for right, right_date in enumerate(assessment_dates):
+        while (right_date - assessment_dates[left]).days > 10:
+            left += 1
+        max_assessments_in_10_days = max(max_assessments_in_10_days, right - left + 1)
+
+    structural_overload = bool(
+        peak_week_stress_score > p85_stress and max_assessments_in_10_days >= 2
+    )
+
+    if burnout_probability >= 80:
+        alert_level = "Critical"
+    elif burnout_probability >= 60:
+        alert_level = "High Risk"
+    elif burnout_probability >= 40:
+        alert_level = "Elevated"
+    else:
+        alert_level = "Normal"
+
+    weeks_detected = len(weekly_metrics)
+    weeks_factor = min(1.0, weeks_detected / 12.0)
+    completeness_scores: List[float] = []
+    if isinstance(study_guide, dict):
+        for info in study_guide.values():
+            if not isinstance(info, dict):
+                continue
+            total = info.get("total_weight_detected")
+            if isinstance(total, (int, float)) and total > 0:
+                completeness_scores.append(max(0.0, 1.0 - (abs(float(total) - 100.0) / 100.0)))
+    weight_completeness = sum(completeness_scores) / len(completeness_scores) if completeness_scores else 0.35
+    confidence = round(min(100.0, max(0.0, (weeks_factor * 55.0) + (weight_completeness * 45.0))), 1)
+
+    insights = [
+        (
+            f"{peak_label} peak stress={peak_week_stress_score:.1f} versus p85={p85_stress:.1f}, "
+            f"with acceleration_index={acceleration_index:.1f}."
+        ),
+        (
+            f"Compression signal in peak week: weight={compression_weight_percent:.1f}% "
+            f"across a {compression_window_days:.0f}-day window."
+        ),
+        (
+            f"Assessments >=10% within 10 days: {max_assessments_in_10_days}; "
+            f"structural_overload={structural_overload}."
+        ),
+    ]
+
+    strategy = [
+        "Pre-shift one high-effort task out of peak week to lower stress_score below p85 exposure.",
+        "Front-load exam prep in weeks with rising acceleration_index to flatten stress jumps.",
+        "Reduce compression by splitting deliverables when 2+ weighted assessments cluster within 10 days.",
+    ]
+
+    return {
+        "stress_score": stress_score,
+        "acceleration_index": round(acceleration_index, 1),
+        "burnout_probability": burnout_probability,
+        "structural_overload": structural_overload,
+        "alert_level": alert_level,
+        "insights": insights,
+        "strategy": strategy,
+        "confidence": confidence,
+        "compression_risk": compression_risk,
+    }
 
 
 def _derive_time_allocation_from_metrics(
@@ -1788,15 +1967,17 @@ def _fallback_ai_intelligence(
     summary_json: Dict[str, object],
     metrics: Optional[Dict[str, object]] = None,
     simulation_results: Optional[Dict[str, object]] = None,
+    weekly_metrics: Optional[Dict[str, Dict[str, object]]] = None,
 ) -> Dict[str, object]:
     def _num(key: str, default: float = 0.0) -> float:
         value = summary_json.get(key, default)
         return float(value) if isinstance(value, (int, float)) else default
 
-    if isinstance(metrics, dict):
-        weekly_metrics = _aggregate_weekly_metrics(metrics.get("study_guide", {}))
-    else:
-        weekly_metrics = {}
+    if not isinstance(weekly_metrics, dict):
+        if isinstance(metrics, dict):
+            weekly_metrics = _aggregate_weekly_metrics(metrics.get("study_guide", {}))
+        else:
+            weekly_metrics = {}
     total_weeks = max(1.0, _num("total_weeks", 1.0))
     high_pressure_weeks = _num("high_pressure_weeks", 0.0)
     peak_stress = _num("peak_stress_score", 0.0)
@@ -1829,6 +2010,9 @@ def _fallback_ai_intelligence(
     why_risky = _build_why_risky(summary_json, weekly_metrics, kpis)
     allocation = _derive_time_allocation_from_metrics(metrics, summary_json)
     simulation_narrative = _build_simulation_narrative(simulation_results, simulation_impact)
+    ai_intelligence = compute_ai_intelligence(summary_json, metrics=metrics, weekly_metrics=weekly_metrics)
+    kpis["acceleration_index"] = float(ai_intelligence.get("acceleration_index") or 0.0)
+    kpis["compression_risk"] = float(ai_intelligence.get("compression_risk") or kpis.get("compression_risk") or 0.0)
 
     return {
         "kpis": kpis,
@@ -1836,6 +2020,7 @@ def _fallback_ai_intelligence(
         "simulation_impact": simulation_impact,
         "simulation_narrative": simulation_narrative,
         "time_allocation_strategy": allocation,
+        "ai_intelligence": ai_intelligence,
     }
 
 
@@ -1868,8 +2053,19 @@ def call_ai_intelligence(
         summary_json,
         metrics=metrics,
         simulation_results=simulation_results,
+        weekly_metrics=weekly_metrics,
     )
     simulation_impact_real = _derive_simulation_impact(simulation_results)
+
+    def _apply_dashboard_kpi_compat(payload: Dict[str, object]) -> Dict[str, object]:
+        kpis = payload.get("kpis")
+        if isinstance(kpis, dict):
+            if "acceleration_index" in kpis:
+                kpis["stress_acceleration_index"] = kpis["acceleration_index"]
+            if "compression_risk" in kpis:
+                kpis["compression_risk_score"] = kpis["compression_risk"]
+            payload["kpis"] = kpis
+        return payload
 
     prompt = (
         "SYSTEM: You are an academic workload AI intelligence module.\n"
@@ -2093,25 +2289,32 @@ def call_ai_intelligence(
         )
         response_text = _extract_response_text(response)
     except Exception:
-        return fallback
+        return _apply_dashboard_kpi_compat(fallback)
 
     parsed = _parse_json_object(response_text)
     if not _validate(parsed):
-        return fallback
+        return _apply_dashboard_kpi_compat(fallback)
 
     assert isinstance(parsed, dict)
+    ai_intelligence = compute_ai_intelligence(
+        summary_json,
+        metrics=metrics,
+        weekly_metrics=weekly_metrics,
+    )
     parsed_kpis = parsed.get("kpis")
     if isinstance(parsed_kpis, dict):
-        acceleration_index, compression_risk = _derive_acceleration_and_compression_risk(
-            weekly_metrics,
-            str(summary_json.get("peak_week") or ""),
-        )
-        parsed_kpis["acceleration_index"] = acceleration_index
-        parsed_kpis["compression_risk"] = compression_risk
+        parsed_kpis["acceleration_index"] = float(ai_intelligence.get("acceleration_index") or 0.0)
+        parsed_kpis["compression_risk"] = float(ai_intelligence.get("compression_risk") or 0.0)
         parsed_kpis["peak_delta_percent"] = round(float(simulation_impact_real.get("peak_delta_percent") or 0.0), 1)
+        # Dashboard compatibility layer: keep existing keys and provide expected aliases.
+        if "acceleration_index" in parsed_kpis:
+            parsed_kpis["stress_acceleration_index"] = parsed_kpis["acceleration_index"]
+        if "compression_risk" in parsed_kpis:
+            parsed_kpis["compression_risk_score"] = parsed_kpis["compression_risk"]
         parsed["kpis"] = parsed_kpis
 
     parsed["simulation_narrative"] = _build_simulation_narrative(simulation_results, simulation_impact_real)
+    parsed["ai_intelligence"] = ai_intelligence
 
     allocation = parsed.get("time_allocation_strategy")
     if isinstance(allocation, dict):
@@ -2129,7 +2332,7 @@ def call_ai_intelligence(
                 "homework": homework,
             }
 
-    return parsed
+    return _apply_dashboard_kpi_compat(parsed)
 
 
 def call_ibm_ai(

@@ -1,7 +1,22 @@
 ## [Unreleased]
+- Added `compute_ai_intelligence()` (AI-only layer) and attached `ai_intelligence` to returned AI payloads without changing deterministic engine behavior.
+- `ai_intelligence` now includes:
+  - `stress_score`, `acceleration_index`, `burnout_probability`
+  - `structural_overload`, `alert_level`, `insights`, `strategy`, `confidence`
+- Structural overload detection added:
+  - `weekly_stress_score > p85_stress`
+  - and at least 2 assessments with `>=10%` weight clustered within 10 days.
+- Alert tiers standardized:
+  - `Normal` (0–39), `Elevated` (40–59), `High Risk` (60–79), `Critical` (80–100)
+- AI KPI binding fixed to finalized `weekly_metrics`:
+  - `acceleration_index` from weekly max acceleration
+  - `compression_risk` from peak-week `compression_weight_percent * compression_window_days`
+  - warning/debug logs added for binding visibility (`peak_week`, `acceleration_index`, `compression_risk`)
+- Dashboard compatibility aliases added to AI KPI block:
+  - `stress_acceleration_index` and `compression_risk_score` are now provided as duplicates of canonical fields.
 - AI KPI calculation hardened to rely on real engine `weekly_metrics`:
   - `acceleration_index` = max weekly stress acceleration.
-  - `compression_risk` = peak-week compression weight × compression window (normalized/capped).
+  - `compression_risk` = peak-week compression weight × compression window.
   - Warning log added when `peak_week` is not present in `weekly_metrics`.
 - Simulation intelligence upgraded:
   - Added KPI `peak_delta_percent` (baseline vs selected scenario).
