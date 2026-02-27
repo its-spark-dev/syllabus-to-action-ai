@@ -1,22 +1,40 @@
-MATH 2568 – Linear Algebra (Spring 2026)
-Instructor: Prof. Priya Nandakumar
+Course: MATH 2568 – Linear Algebra
+Semester: Spring 2026
+First Day of Class: January 12, 2026
 
-Assignments & Schedule
-Problem Set 1: Vectors — due January 17
-Problem Set 2: Matrix Operations — due January 31 (5%)
-Problem Set 3: Determinants — due February 7
-Problem Set 4: Eigenvalues — due February 21 (5%)
-Problem Set 5: Diagonalization — due March 7
-Problem Set 6: Applications — due April 4 (5%)
-Project Report — due April 18 (15%)
+Default Deadlines:
+Homework – Tuesday 11:59 PM
+Quiz – Thursday in class
+Project – Sunday 11:59 PM
 
-Quiz 1: February 5 (10%)
-Quiz 2: March 5 (10%)
-Final Exam: April 30 (30%)
+GRADING (Total 100%):
+Homework (12 total, lowest 2 dropped) – 24%
+Quizzes (8 total, lowest 1 dropped) – 16%
+Midterm 1 – February 24, 2026 – 15%
+Midterm 2 – March 31, 2026 – 15%
+Mini Project – 10%
+Final Exam – April 28, 2026 – 20%
 
-Grading Breakdown
-Problem Sets: 30%
-Quizzes: 20%
-Project: 15%
-Final Exam: 30%
-Participation: 5%
+Homework:
+HW1 – Due January 20, 2026
+HW2 – Due January 27, 2026
+HW3 – Due February 3, 2026
+HW4 – Due February 10, 2026
+HW5 – Due February 17, 2026
+HW6 – Due March 3, 2026
+HW7 – Due March 10, 2026
+HW8 – Due March 17, 2026
+HW9 – Due March 24, 2026
+HW10 – Due April 7, 2026
+HW11 – Due April 14, 2026
+HW12 – Due April 21, 2026
+
+Mini Project:
+Proposal – Due March 15, 2026 – 3%
+Final Report – Due April 12, 2026 – 5%
+Presentation – April 16, 2026 – 2%
+
+Exams:
+Midterm 1 – February 24, 2026
+Midterm 2 – March 31, 2026
+Final Exam – April 28, 2026

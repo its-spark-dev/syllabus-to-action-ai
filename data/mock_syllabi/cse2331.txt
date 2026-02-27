@@ -1,27 +1,44 @@
-CSE 2331 – Data Structures (Spring 2026)
-Instructor: Dr. Alana Ruiz
+Course: CSE 2331 – Foundations II: Data Structures & Algorithms
+Semester: Spring 2026
+First Day of Class: January 12, 2026
 
-Course Overview
-This course covers algorithmic techniques, performance analysis, and core data structures.
+Default Deadlines:
+Homework – Sunday 11:59 PM
+Lab – Thursday 11:59 PM
+Quiz – Monday 9:10 AM
 
-Assignments & Schedule
-Homework 1: Arrays and Big-O — due January 19
-Homework 2: Stacks & Queues — due January 26 (5%)
-Homework 3: Trees — due February 2
-Homework 4: Hash Tables — due February 9 (5%)
-Homework 5: Graphs — due February 23
-Homework 6: Sorting & Searching — due March 2 (5%)
-Project Proposal — due February 16 (10%)
-Project Demo — due March 28
+GRADING (Total 100%):
+Weekly Homework (9 total, lowest 1 dropped) – 18%
+Labs (10 total, lowest 1 dropped) – 22%
+Quizzes (10 total, lowest 2 dropped) – 10%
+Midterm 1 – March 5, 2026 – 15%
+Midterm 2 – April 2, 2026 – 15%
+Final Exam – April 25, 2026 – 20%
 
-Midterm 1: February 12 (20%)
-Midterm 2: March 12 (20%)
-Final Exam: April 29 (25%)
+Homework Due Dates:
+HW1 – Big-O Analysis – Due January 18, 2026
+HW2 – Recurrences – Due January 25, 2026
+HW3 – Sorting Algorithms – Due February 1, 2026
+HW4 – Binary Trees – Due February 8, 2026
+HW5 – Heaps – Due February 15, 2026
+HW6 – Hash Tables – Due February 22, 2026
+HW7 – Graph Traversals – Due March 1, 2026
+HW8 – Shortest Paths – Due March 15, 2026
+HW9 – Dynamic Programming – Due March 29, 2026
 
-Grading Breakdown
-Homework (6 total): 25%
-Project: 15%
-Midterm 1: 20%
-Midterm 2: 20%
-Final Exam: 25%
-Participation: 5%
+Lab Due Dates:
+Lab1 – Java Setup – Due January 15, 2026
+Lab2 – LinkedList – Due January 22, 2026
+Lab3 – Stack & Queue – Due January 29, 2026
+Lab4 – Tree Implementation – Due February 5, 2026
+Lab5 – Heap Implementation – Due February 12, 2026
+Lab6 – Hash Table Implementation – Due February 19, 2026
+Lab7 – Graph BFS/DFS – Due February 26, 2026
+Lab8 – Balanced Trees – Due March 12, 2026
+Lab9 – Dijkstra – Due March 26, 2026
+Lab10 – Review Project – Due April 16, 2026
+
+Exams:
+Midterm 1 – March 5, 2026
+Midterm 2 – April 2, 2026
+Final Exam – April 25, 2026

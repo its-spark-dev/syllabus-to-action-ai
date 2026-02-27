@@ -1,24 +1,33 @@
-ECON 1011 – Principles of Microeconomics (Spring 2026)
-Instructor: Dr. Michael Huang
+Course: ECON 1011 – Principles of Microeconomics
+Semester: Spring 2026
+First Day of Class: January 12, 2026
 
-Assignments & Schedule
-Reading Response 1 — due January 20
-Reading Response 2 — due February 3 (5%)
-Problem Set 1 — due February 10
-Problem Set 2 — due February 24 (5%)
-Problem Set 3 — due March 10
-Problem Set 4 — due March 31 (5%)
-Policy Memo Draft — due April 7
-Final Policy Memo — due April 21 (15%)
+Default Deadlines:
+Problem Set – Sunday 11:59 PM
+Quiz – Thursday 11:59 PM
+Discussion Post – Monday 11:59 PM
 
-Midterm Exam: March 3 (25%)
-Midterm Exam 2: April 2 (20%)
-Final Exam: May 2 (30%)
+GRADING (Total 100%):
+Problem Sets (10 total, lowest 1 dropped) – 25%
+Quizzes (10 total, lowest 2 dropped) – 15%
+Discussion (10 total, lowest 2 dropped) – 10%
+Midterm 1 – February 19, 2026 – 15%
+Midterm 2 – March 26, 2026 – 15%
+Final Exam – April 29, 2026 – 20%
 
-Grading Breakdown
-Problem Sets: 20%
-Reading Responses: 10%
-Policy Memo Project: 15%
-Midterm Exam 1: 25%
-Midterm Exam 2: 20%
-Final Exam: 30%
+Problem Sets:
+PS1 – Due January 18, 2026
+PS2 – Due January 25, 2026
+PS3 – Due February 1, 2026
+PS4 – Due February 8, 2026
+PS5 – Due February 15, 2026
+PS6 – Due March 1, 2026
+PS7 – Due March 8, 2026
+PS8 – Due March 22, 2026
+PS9 – Due April 5, 2026
+PS10 – Due April 19, 2026
+
+Exams:
+Midterm 1 – February 19, 2026
+Midterm 2 – March 26, 2026
+Final Exam – April 29, 2026

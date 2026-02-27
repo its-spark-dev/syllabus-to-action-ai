@@ -1,42 +1,32 @@
-CSE 3470 – Advanced Software Systems
+Course: CSE 3470 – Computer Networking
+Semester: Spring 2026
+First Day of Class: January 12, 2026
 
-Instructor: Dr. Emily Carter
-Office Hours: Wed 3–5pm
-Location: Dreese Labs 280
+Default Deadlines:
+Quiz – Wednesday 11:59 PM
+Programming Assignment – Sunday 11:59 PM
+Case Study – Friday 11:59 PM
 
-Course Description:
-This course covers distributed systems, concurrency, and large-scale architecture design.
+GRADING (Total 100%):
+Quizzes (10 total, lowest 2 dropped) – 10%
+Programming Assignments (5 total) – 35%
+Case Studies (4 total) – 15%
+Midterm – March 11, 2026 – 15%
+Final Exam – April 27, 2026 – 25%
 
-Grading Breakdown:
-Homework Assignments (8 total) – 20%
-Programming Project – 25%
-Midterm Exam – 20%
-Final Exam – 30%
-Participation & Attendance – 5%
+Programming Assignments:
+PA1 – HTTP Client – Due February 1, 2026
+PA2 – Reliable UDP – Due February 22, 2026
+PA3 – Router Simulation – Due March 22, 2026
+PA4 – TCP Analysis – Due April 5, 2026
+PA5 – Mini CDN Cache – Due April 19, 2026
 
-Homework 1 – Threads and Processes (Due Jan 29)
-Homework 2 – Synchronization (Due Feb 5)
-Homework 3 – Deadlocks (Due Feb 12)
-Homework 4 – Distributed Systems Intro (Due Feb 19)
-Homework 5 – RPC and Messaging (Due Feb 26)
-Homework 6 – Fault Tolerance (Due March 10)
-Homework 7 – Scaling Strategies (Due March 24)
-Homework 8 – Microservices (Due April 7)
+Case Studies:
+CS1 – Net Neutrality Memo – Due January 30, 2026
+CS2 – DNS Outage Analysis – Due February 27, 2026
+CS3 – BGP Incident Report – Due March 27, 2026
+CS4 – Privacy Brief – Due April 17, 2026
 
-Quiz 1 – Concurrency Basics (Feb 8)
-Quiz 2 – Deadlocks & Recovery (Feb 22)
-Quiz 3 – RPC & Messaging (March 17)
-
-Midterm Exam – March 5 (20%)
-
-Programming Project Proposal – Feb 15 (5%)
-Programming Project Milestone 1 – March 20 (5%)
-Programming Project Milestone 2 – April 10 (5%)
-Programming Project Final Submission – April 20 (10%)
-
-Final Exam – Comprehensive – April 30 (30%)
-
-Important Notes:
-- Late homework loses 10% per day.
-- Project milestones must be completed sequentially.
-- Final exam covers Chapters 1–14.
+Exams:
+Midterm – March 11, 2026
+Final Exam – April 27, 2026

@@ -1,24 +1,39 @@
-CSE 2421 – Systems Programming (Spring 2026)
-Instructor: Dr. Renee McBride
+Course: CSE 2421 – Systems I: Low-Level Programming
+Semester: Spring 2026
+First Day of Class: January 12, 2026
 
-Assignments & Schedule
-Lab 1: Unix Tools — due January 22
-Lab 2: Processes — due January 29 (5%)
-Lab 3: Memory — due February 12
-Lab 4: File Systems — due February 26 (5%)
-Lab 5: Threads — due March 5
-Lab 6: Networking — due March 19 (5%)
-Project Checkpoint — due March 26
-Final Project Report — due April 16 (20%)
+Default Deadlines:
+Homework – Tuesday 11:59 PM
+Lab – Friday 11:59 PM
+Project – Sunday 11:59 PM
 
-Midterm 1: February 19 (20%)
-Midterm 2: March 26 (20%)
-Final Exam: May 1 (25%)
+GRADING (Total 100%):
+Reading Quizzes (10 total, lowest 2 dropped) – 10%
+Labs (8 total, lowest 1 dropped) – 30%
+Homework (6 total) – 15%
+Project (Milestones + Final) – 25%
+Midterm – March 3, 2026 – 10%
+Final Exam – April 28, 2026 – 10%
 
-Grading Breakdown
-Labs: 25%
-Project: 20%
-Midterm 1: 20%
-Midterm 2: 20%
-Final Exam: 25%
-Participation: 5%
+Homework:
+HW1 – C Basics – Due January 20, 2026
+HW2 – Pointers – Due February 3, 2026
+HW3 – File I/O – Due February 17, 2026
+HW4 – Processes – Due March 10, 2026
+HW5 – Threads – Due March 24, 2026
+HW6 – Networking – Due April 7, 2026
+
+Labs:
+Lab1 – Toolchain Setup – Due January 23, 2026
+Lab2 – Bit Manipulation – Due February 6, 2026
+Lab3 – Struct Parsing – Due February 20, 2026
+Lab4 – fork/exec – Due March 13, 2026
+Lab5 – pthread – Due March 27, 2026
+Lab6 – Sockets – Due April 10, 2026
+Lab7 – Performance Profiling – Due April 17, 2026
+Lab8 – Final Polish – Due April 24, 2026
+
+Project Milestones:
+Milestone 1 – CLI Parser – Due February 15, 2026 – 8%
+Milestone 2 – Scheduler – Due March 29, 2026 – 8%
+Final Project – Mini Shell – Due April 19, 2026 – 9%
