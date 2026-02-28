@@ -470,9 +470,10 @@ def _inject_styles() -> None:
                 width: 6px;
                 height: 6px;
                 border-radius: 50%;
-                background: rgba(224, 242, 255, 0.95);
-                box-shadow: 0 0 0 1px rgba(127, 178, 255, 0.58), 0 0 8px rgba(122, 185, 255, 0.34);
+                background: #ff4a4a;
+                box-shadow: 0 0 0 1px rgba(255, 120, 120, 0.42), 0 0 8px rgba(255, 74, 74, 0.32);
                 flex-shrink: 0;
+                animation: aiLiveDot 1s ease-in-out infinite;
             }}
             .ai-insight-chip {{
                 display: inline-block;
@@ -698,6 +699,18 @@ def _inject_styles() -> None:
             @keyframes aiBadgeFadeIn {{
                 from {{ opacity: 0; transform: translateY(2px); }}
                 to {{ opacity: 1; transform: translateY(0); }}
+            }}
+            @keyframes aiLiveDot {{
+                0%, 100% {{
+                    opacity: 0.35;
+                    transform: scale(0.88);
+                    box-shadow: 0 0 0 1px rgba(255, 120, 120, 0.35), 0 0 4px rgba(255, 74, 74, 0.2);
+                }}
+                50% {{
+                    opacity: 1;
+                    transform: scale(1.06);
+                    box-shadow: 0 0 0 1px rgba(255, 144, 144, 0.5), 0 0 11px rgba(255, 74, 74, 0.58);
+                }}
             }}
             .js-plotly-plot .scatterlayer .trace:last-child path {{
                 transform-box: fill-box;
