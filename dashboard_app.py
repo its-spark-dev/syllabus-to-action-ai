@@ -82,28 +82,25 @@ def _parse_due_date(date_str: str):
 
 
 @lru_cache(maxsize=1)
-def _load_background_svg_base64() -> Tuple[str, str]:
+def _load_background_png_base64() -> Tuple[str, str]:
     assets_dir = Path(__file__).resolve().parent / "assets"
-    light_svg = (assets_dir / "wallpaper.svg").read_bytes()
-    dark_svg = (assets_dir / "wallpaper_dark.svg").read_bytes()
+    light_png = (assets_dir / "lightmode-wallpaper.png").read_bytes()
+    dark_png = (assets_dir / "darkmode-wallpaper.png").read_bytes()
     return (
-        base64.b64encode(light_svg).decode("ascii"),
-        base64.b64encode(dark_svg).decode("ascii"),
+        base64.b64encode(light_png).decode("ascii"),
+        base64.b64encode(dark_png).decode("ascii"),
     )
 
 
 def _inject_styles() -> None:
-    light_bg_b64, dark_bg_b64 = _load_background_svg_base64()
+    light_bg_b64, dark_bg_b64 = _load_background_png_base64()
     st.markdown(
         f"""
         <style>
             :root {{
-                --bg-img-light: url("data:image/svg+xml;base64,{light_bg_b64}");
-                --bg-img-dark: url("data:image/svg+xml;base64,{dark_bg_b64}");
+                --bg-img-light: url("data:image/png;base64,{light_bg_b64}");
+                --bg-img-dark: url("data:image/png;base64,{dark_bg_b64}");
                 --bg-img: var(--bg-img-dark);
-                --bg-overlay-1: rgba(18, 102, 255, 0.83);
-                --bg-overlay-2: rgba(2, 47, 168, 0.74);
-                --vignette: radial-gradient(ellipse 100% 42% at 50% 100%, rgba(0, 10, 40, 0.35) 0%, rgba(0, 0, 30, 0.22) 25%, rgba(0, 0, 0, 0.10) 40%, rgba(0, 0, 0, 0.00) 60%);
                 --font-family: "SF Pro Text", "SF Pro Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
                 --font-h1: 42px;
                 --font-section: 19px;
@@ -132,6 +129,7 @@ def _inject_styles() -> None:
                 --focus-ring: rgba(154, 202, 255, 0.68);
                 --sidebar-text-primary: rgba(238, 246, 255, 0.96);
                 --sidebar-text-secondary: rgba(214, 226, 246, 0.90);
+                --sidebar-surface: rgba(10, 20, 45, 0.72);
                 --sidebar-input-bg: rgba(12, 24, 52, 0.42);
                 --sidebar-input-border: var(--card-border);
                 --sidebar-button-bg: rgba(255, 255, 255, 0.09);
@@ -139,14 +137,12 @@ def _inject_styles() -> None:
             }}
             html[data-theme="light"] {{
                 --bg-img: var(--bg-img-light);
-                --bg-overlay-1: rgba(110, 170, 255, 0.66);
-                --bg-overlay-2: rgba(56, 128, 232, 0.65);
-                --vignette: none;
                 --text-primary: rgba(248, 251, 255, 0.98);
                 --text-secondary: rgba(227, 236, 252, 0.84);
                 --focus-ring: rgba(132, 180, 242, 0.64);
                 --sidebar-text-primary: rgba(28, 40, 62, 0.95);
                 --sidebar-text-secondary: rgba(67, 84, 112, 0.88);
+                --sidebar-surface: rgba(255, 255, 255, 0.72);
                 --sidebar-input-bg: rgba(255, 255, 255, 0.72);
                 --sidebar-input-border: rgba(106, 128, 164, 0.45);
                 --sidebar-button-bg: rgba(255, 255, 255, 0.82);
@@ -154,12 +150,10 @@ def _inject_styles() -> None:
             }}
             html[data-theme="dark"] {{
                 --bg-img: var(--bg-img-dark);
-                --bg-overlay-1: rgba(18, 102, 255, 0.83);
-                --bg-overlay-2: rgba(2, 47, 168, 0.74);
-                --vignette: radial-gradient(ellipse 100% 42% at 50% 100%, rgba(0, 10, 40, 0.35) 0%, rgba(0, 0, 30, 0.22) 25%, rgba(0, 0, 0, 0.10) 40%, rgba(0, 0, 0, 0.00) 60%);
                 --text-primary: rgba(246, 250, 255, 0.98);
                 --text-secondary: rgba(209, 222, 246, 0.84);
                 --focus-ring: rgba(154, 202, 255, 0.68);
+                --sidebar-surface: rgba(10, 20, 45, 0.72);
             }}
             html:not([data-theme]) {{
                 --bg-img: var(--bg-img-dark);
@@ -167,14 +161,12 @@ def _inject_styles() -> None:
             @media (prefers-color-scheme: light) {{
                 html:not([data-theme]) {{
                     --bg-img: var(--bg-img-light);
-                    --bg-overlay-1: rgba(110, 170, 255, 0.66);
-                    --bg-overlay-2: rgba(56, 128, 232, 0.65);
-                    --vignette: none;
                     --text-primary: rgba(248, 251, 255, 0.98);
                     --text-secondary: rgba(227, 236, 252, 0.84);
                     --focus-ring: rgba(132, 180, 242, 0.64);
                     --sidebar-text-primary: rgba(28, 40, 62, 0.95);
                     --sidebar-text-secondary: rgba(67, 84, 112, 0.88);
+                    --sidebar-surface: rgba(255, 255, 255, 0.72);
                     --sidebar-input-bg: rgba(255, 255, 255, 0.72);
                     --sidebar-input-border: rgba(106, 128, 164, 0.45);
                     --sidebar-button-bg: rgba(255, 255, 255, 0.82);
@@ -184,12 +176,10 @@ def _inject_styles() -> None:
             @media (prefers-color-scheme: dark) {{
                 html:not([data-theme]) {{
                     --bg-img: var(--bg-img-dark);
-                    --bg-overlay-1: rgba(18, 102, 255, 0.83);
-                    --bg-overlay-2: rgba(2, 47, 168, 0.74);
-                    --vignette: radial-gradient(ellipse 100% 42% at 50% 100%, rgba(0, 10, 40, 0.35) 0%, rgba(0, 0, 30, 0.22) 25%, rgba(0, 0, 0, 0.10) 40%, rgba(0, 0, 0, 0.00) 60%);
                     --text-primary: rgba(246, 250, 255, 0.98);
                     --text-secondary: rgba(209, 222, 246, 0.84);
                     --focus-ring: rgba(154, 202, 255, 0.68);
+                    --sidebar-surface: rgba(10, 20, 45, 0.72);
                 }}
             }}
             html, body {{
@@ -198,19 +188,6 @@ def _inject_styles() -> None:
             }}
             body {{
                 font-family: var(--font-family);
-            }}
-            body::before {{
-                content: "";
-                position: fixed;
-                inset: 0;
-                z-index: -3;
-                pointer-events: none;
-                background-image: var(--bg-img);
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-                background-attachment: fixed;
-                filter: saturate(110%) contrast(105%);
             }}
             [data-testid="stAppViewContainer"] {{
                 position: relative;
@@ -225,27 +202,17 @@ def _inject_styles() -> None:
                 inset: 0;
                 z-index: 0;
                 pointer-events: none;
-                background: linear-gradient(115deg, var(--bg-overlay-1) 0%, var(--bg-overlay-2) 62%, rgba(0, 76, 214, 0.65) 100%);
-            }}
-            [data-testid="stAppViewContainer"]::after {{
-                content: "";
-                position: fixed;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                height: 44vh;
-                z-index: 1;
-                pointer-events: none;
-                background: var(--vignette);
+                background-image: var(--bg-img);
+                background-size: cover;
+                background-position: center;
                 background-repeat: no-repeat;
-                background-position: center bottom;
-                background-size: 100% 44vh;
+                background-attachment: fixed;
             }}
             [data-testid="stAppViewContainer"] > .main,
             [data-testid="stHeader"],
             [data-testid="stSidebar"] {{
                 position: relative;
-                z-index: 2;
+                z-index: 1;
             }}
             .stApp {{
                 background: transparent !important;
@@ -260,6 +227,13 @@ def _inject_styles() -> None:
             }}
             [data-testid="stSidebar"] {{
                 color: var(--sidebar-text-primary);
+                background: transparent !important;
+            }}
+            [data-testid="stSidebar"] > div:first-child {{
+                background: var(--sidebar-surface) !important;
+                border-right: 1px solid var(--sidebar-input-border);
+                backdrop-filter: blur(12px) saturate(135%);
+                -webkit-backdrop-filter: blur(12px) saturate(135%);
             }}
             [data-testid="stSidebar"] p,
             [data-testid="stSidebar"] li,
@@ -813,10 +787,6 @@ def _inject_styles() -> None:
                 [data-testid="stExpander"] {{
                     border-radius: 16px;
                     padding: 16px;
-                }}
-                [data-testid="stAppViewContainer"]::after {{
-                    height: 36vh;
-                    background-size: 100% 36vh;
                 }}
                 .app-title {{
                     font-size: 34px;
