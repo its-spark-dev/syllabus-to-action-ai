@@ -208,6 +208,50 @@ def _inject_styles() -> None:
                 margin-bottom: 0.2rem;
             }
             .ai-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.36rem;
+                font-size: 10.5px;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                font-weight: 700;
+                line-height: 1.1;
+                color: #bfe9ff;
+                background: linear-gradient(135deg, rgba(0,120,255,0.25), rgba(80,0,255,0.25));
+                border: 1px solid rgba(0,180,255,0.4);
+                border-radius: 999px;
+                padding: 4px 10px;
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
+                white-space: nowrap;
+                animation: aiBadgeFadeIn 0.4s ease both;
+                transition: box-shadow 0.2s ease;
+            }
+            .ai-badge::before {
+                content: "";
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: rgba(186, 232, 255, 0.92);
+                box-shadow:
+                    0 0 0 1px rgba(90, 188, 255, 0.55),
+                    0 0 6px rgba(0, 140, 255, 0.42);
+                flex-shrink: 0;
+            }
+            .ai-badge:hover {
+                box-shadow: 0 0 8px rgba(0,140,255,0.5);
+            }
+            .ai-section-header {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                margin-bottom: 0.5rem;
+            }
+            .ai-section-header .section-title {
+                margin-bottom: 0;
+            }
+            .ai-insight-chip {
                 display: inline-block;
                 font-size: 0.64rem;
                 letter-spacing: 0.08em;
@@ -307,6 +351,10 @@ def _inject_styles() -> None:
                 0% { transform: scale(1.0); filter: drop-shadow(0 0 3px rgba(166, 242, 255, 0.25)); }
                 50% { transform: scale(1.055); filter: drop-shadow(0 0 7px rgba(166, 242, 255, 0.38)); }
                 100% { transform: scale(1.0); filter: drop-shadow(0 0 3px rgba(166, 242, 255, 0.25)); }
+            }
+            @keyframes aiBadgeFadeIn {
+                from { opacity: 0; transform: translateY(2px); }
+                to { opacity: 1; transform: translateY(0); }
             }
             .js-plotly-plot .scatterlayer .trace:last-child path {
                 transform-box: fill-box;
@@ -611,7 +659,15 @@ def _weekly_metrics_to_stress_risk(
 
 def _render_peak_breakdown(contributors: List[Dict[str, object]], peak_week: str) -> None:
     with st.container(key="card_peak_breakdown"):
-        st.markdown('<div class="section-title">Peak Breakdown</div>', unsafe_allow_html=True)
+        st.markdown(
+            (
+                '<div class="ai-section-header">'
+                '<span class="ai-badge">AI GENERATED</span>'
+                '<div class="section-title">Peak Breakdown</div>'
+                "</div>"
+            ),
+            unsafe_allow_html=True,
+        )
         if not contributors:
             st.info("No peak-week contributors detected.")
             return
@@ -636,7 +692,15 @@ def _render_simulation_results(
     strategy_result: Dict[str, object],
 ) -> None:
     with st.container(key="card_what_if_results"):
-        st.markdown('<div class="section-title">What-if Results</div>', unsafe_allow_html=True)
+        st.markdown(
+            (
+                '<div class="ai-section-header">'
+                '<span class="ai-badge">AI GENERATED</span>'
+                '<div class="section-title">What-if Results</div>'
+                "</div>"
+            ),
+            unsafe_allow_html=True,
+        )
         shift_error = shift_result.get("error") if isinstance(shift_result, dict) else None
         strategy_error = strategy_result.get("error") if isinstance(strategy_result, dict) else None
 
@@ -669,7 +733,15 @@ def _render_simulation_results(
 
 def _render_ai_intelligence_card(ai_payload: Dict[str, object]) -> None:
     with st.container(key="card_ai_intelligence"):
-        st.markdown('<div class="section-title">AI Intelligence Explanation</div>', unsafe_allow_html=True)
+        st.markdown(
+            (
+                '<div class="ai-section-header">'
+                '<span class="ai-badge">AI GENERATED</span>'
+                '<div class="section-title">AI Intelligence Explanation</div>'
+                "</div>"
+            ),
+            unsafe_allow_html=True,
+        )
         if not isinstance(ai_payload, dict):
             st.info("AI intelligence is unavailable.")
             return
@@ -784,7 +856,7 @@ def _render_kpis(
         card_key = f"card_kpi_{idx}_risk-red" if is_risk else f"card_kpi_{idx}"
         with cols[idx]:
             with st.container(key=card_key):
-                st.markdown('<span class="ai-badge">AI Insight</span>', unsafe_allow_html=True)
+                st.markdown('<span class="ai-insight-chip">AI Insight</span>', unsafe_allow_html=True)
                 st.markdown(f'<div class="kpi-label">{label}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="kpi-value">{value}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="kpi-sub">{sub}</div>', unsafe_allow_html=True)
@@ -1220,7 +1292,15 @@ def _render_ai_strategy_card(
     study_guide: Dict[str, Dict[str, object]],
 ) -> None:
     with st.container(key="card_ai_strategy"):
-        st.markdown('<div class="section-title">AI Strategy</div>', unsafe_allow_html=True)
+        st.markdown(
+            (
+                '<div class="ai-section-header">'
+                '<span class="ai-badge">AI GENERATED</span>'
+                '<div class="section-title">AI Strategy</div>'
+                "</div>"
+            ),
+            unsafe_allow_html=True,
+        )
 
         weeks_sorted = sorted(stress_score_by_week.keys(), key=_week_sort_key)
         peak_week = max(weeks_sorted, key=lambda w: stress_score_by_week.get(w, 0)) if weeks_sorted else None
@@ -1272,8 +1352,15 @@ def _render_ai_insight_panel(
         elif upcoming_exam_weight >= 25:
             strategic_move = "Reallocate study time toward high-weight exam preparation now."
 
-        st.markdown('<div class="ai-badge">AI Workload Signal</div>', unsafe_allow_html=True)
-        st.markdown('<div class="section-title">AI Insight Panel</div>', unsafe_allow_html=True)
+        st.markdown(
+            (
+                '<div class="ai-section-header">'
+                '<span class="ai-badge">AI GENERATED</span>'
+                '<div class="section-title">AI Workload Signal</div>'
+                "</div>"
+            ),
+            unsafe_allow_html=True,
+        )
         if burnout_risk in {"High Risk", "Critical Risk"}:
             st.markdown('<div class="risk-signal-bar"></div>', unsafe_allow_html=True)
         st.markdown(
@@ -1293,6 +1380,15 @@ def _render_raw_outputs(
     study_guide: Dict[str, Dict[str, object]],
 ) -> None:
     with st.expander("Detailed Weekly Plan", expanded=False):
+        st.markdown(
+            (
+                '<div class="ai-section-header">'
+                '<span class="ai-badge">AI GENERATED</span>'
+                '<div class="section-title">Detailed Weekly Plan</div>'
+                "</div>"
+            ),
+            unsafe_allow_html=True,
+        )
         for index, week in enumerate(sorted(weekly_plan.keys(), key=_week_sort_key)):
             rows = []
             for task in weekly_plan[week]:
@@ -1310,6 +1406,15 @@ def _render_raw_outputs(
                     st.markdown(f"**{week}**")
                     st.table(rows)
     with st.expander("Study Guide Detail", expanded=False):
+        st.markdown(
+            (
+                '<div class="ai-section-header">'
+                '<span class="ai-badge">AI GENERATED</span>'
+                '<div class="section-title">Study Guide Detail</div>'
+                "</div>"
+            ),
+            unsafe_allow_html=True,
+        )
         st.json(study_guide)
 
 
