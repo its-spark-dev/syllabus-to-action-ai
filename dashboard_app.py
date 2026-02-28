@@ -1,6 +1,10 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
+import base64
 from datetime import date, datetime
+from functools import lru_cache
+from pathlib import Path
 from typing import Dict, List, Tuple
 
 import ai.engine as ai_engine
@@ -77,18 +81,24 @@ def _parse_due_date(date_str: str):
     return None
 
 
+@lru_cache(maxsize=1)
+def _load_background_svg_base64() -> Tuple[str, str]:
+    assets_dir = Path(__file__).resolve().parent / "assets"
+    light_svg = (assets_dir / "wallpaper.svg").read_bytes()
+    dark_svg = (assets_dir / "wallpaper_dark.svg").read_bytes()
+    return (
+        base64.b64encode(light_svg).decode("ascii"),
+        base64.b64encode(dark_svg).decode("ascii"),
+    )
+
+
 def _inject_styles() -> None:
     st.markdown(
         """
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
             .stApp {
-                background:
-                    radial-gradient(1200px 760px at 50% 50%, transparent 46%, rgba(0, 0, 0, 0.28) 100%),
-                    radial-gradient(980px 560px at 88% 6%, rgba(69, 214, 255, 0.30), transparent 60%),
-                    radial-gradient(860px 520px at 12% 94%, rgba(108, 92, 255, 0.20), transparent 62%),
-                    radial-gradient(740px 420px at 18% 84%, rgba(44, 219, 190, 0.14), transparent 66%),
-                    linear-gradient(158deg, #030818 0%, #061230 42%, #0A1B45 72%, #07112A 100%);
+                background: transparent !important;
                 color: #E8EEFF;
                 font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
                 font-weight: 300;
@@ -132,16 +142,16 @@ def _inject_styles() -> None:
             }
             .glass-card,
             div[class*="st-key-card_"] {
-                background: rgba(12, 21, 46, 0.66);
-                border: 1px solid rgba(198, 220, 255, 0.12);
+                background: rgba(8, 20, 58, 0.34);
+                border: 1px solid rgba(198, 220, 255, 0.16);
                 border-radius: 22px;
-                backdrop-filter: blur(6px);
-                -webkit-backdrop-filter: blur(6px);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
                 box-shadow:
-                    0 18px 36px rgba(3, 10, 30, 0.4),
-                    0 0 22px rgba(86, 145, 255, 0.09),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-                    inset 0 -8px 14px rgba(3, 8, 24, 0.28);
+                    0 14px 30px rgba(3, 10, 30, 0.28),
+                    0 0 18px rgba(86, 145, 255, 0.05),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                    inset 0 -6px 12px rgba(3, 8, 24, 0.2);
                 padding: 1.25rem;
                 margin-bottom: 0.7rem;
                 transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
@@ -150,8 +160,8 @@ def _inject_styles() -> None:
             div[class*="st-key-card_"]:has(> div[data-testid="stPlotlyChart"]),
             div[class*="st-key-card_"]:has(> div[data-testid="stTable"]),
             div[class*="st-key-card_"]:has(> div[data-testid="stDataFrame"]) {
-                background: rgba(12, 21, 46, 0.60);
-                backdrop-filter: blur(8px);
+                background: rgba(9, 18, 42, 0.38);
+                backdrop-filter: blur(5px);
             }
             div[class*="st-key-card_"]:hover {
                 transform: translateY(-4px);
@@ -316,6 +326,155 @@ def _inject_styles() -> None:
         </style>
         """,
         unsafe_allow_html=True,
+    )
+
+    light_bg_b64, dark_bg_b64 = _load_background_svg_base64()
+    st.markdown(
+        f"""
+        <style>
+            :root {{
+                --bg-img-light: url("data:image/svg+xml;base64,{light_bg_b64}");
+                --bg-img-dark: url("data:image/svg+xml;base64,{dark_bg_b64}");
+                --bg-img: var(--bg-img-dark);
+            }}
+            html:not([data-theme]) {{
+                --bg-img: var(--bg-img-dark);
+            }}
+            html[data-theme="light"] {{
+                --bg-img: var(--bg-img-light);
+            }}
+            html[data-theme="dark"] {{
+                --bg-img: var(--bg-img-dark);
+            }}
+            html, body {{
+                background: transparent !important;
+            }}
+            [data-testid="stAppViewContainer"] {{
+                position: relative;
+                z-index: 0;
+                background: transparent !important;
+            }}
+            body::before {{
+                content: "";
+                position: fixed;
+                inset: 0;
+                z-index: -2;
+                pointer-events: none;
+                background-image: var(--bg-img);
+                background-size: cover;
+                background-position: center center;
+                background-repeat: no-repeat;
+                filter: brightness(0.90) contrast(1.03);
+            }}
+            body::after {{
+                content: "";
+                position: fixed;
+                inset: 0;
+                z-index: -1;
+                pointer-events: none;
+                background: transparent;
+            }}
+            #icloud-theme-toggle {{
+                position: fixed;
+                top: 0.62rem;
+                right: 0.82rem;
+                z-index: 1000;
+                display: inline-flex;
+                gap: 0.3rem;
+                padding: 0.24rem;
+                border-radius: 999px;
+                background: rgba(8, 16, 38, 0.46);
+                border: 1px solid rgba(183, 205, 255, 0.24);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+            }}
+            #icloud-theme-toggle .theme-btn {{
+                border: 0;
+                border-radius: 999px;
+                font-size: 0.68rem;
+                line-height: 1;
+                padding: 0.34rem 0.6rem;
+                color: #EAF2FF;
+                background: rgba(35, 62, 129, 0.35);
+                cursor: pointer;
+            }}
+            #icloud-theme-toggle .theme-btn.active {{
+                background: rgba(108, 150, 255, 0.52);
+                color: #FFFFFF;
+            }}
+            @media (max-width: 700px) {{
+                #icloud-theme-toggle {{
+                    top: 0.55rem;
+                    right: 0.55rem;
+                    gap: 0.2rem;
+                    padding: 0.2rem;
+                }}
+                #icloud-theme-toggle .theme-btn {{
+                    font-size: 0.62rem;
+                    padding: 0.3rem 0.52rem;
+                }}
+            }}
+        </style>
+        <div id="icloud-theme-toggle" aria-label="Theme Toggle">
+            <button type="button" class="theme-btn" data-theme="system">System</button>
+            <button type="button" class="theme-btn" data-theme="light">Light</button>
+            <button type="button" class="theme-btn" data-theme="dark">Dark</button>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    components.html(
+        """
+        <script>
+            (function () {
+                const doc = window.parent.document;
+                const root = doc.documentElement;
+                const key = "theme";
+
+                function applyTheme(theme) {
+                    if (theme === "light" || theme === "dark") {
+                        root.setAttribute("data-theme", theme);
+                    } else {
+                        root.removeAttribute("data-theme");
+                    }
+                    try {
+                        window.parent.localStorage.setItem(key, theme);
+                    } catch (e) {}
+                    const toggle = doc.getElementById("icloud-theme-toggle");
+                    if (!toggle) return;
+                    toggle.querySelectorAll(".theme-btn").forEach((btn) => {
+                        const btnTheme = btn.getAttribute("data-theme");
+                        btn.classList.toggle("active", btnTheme === theme);
+                    });
+                }
+
+                function initTheme() {
+                    let saved = "dark";
+                    try {
+                        saved = window.parent.localStorage.getItem(key) || "dark";
+                    } catch (e) {}
+                    applyTheme(saved);
+                }
+
+                function bindToggle() {
+                    const toggle = doc.getElementById("icloud-theme-toggle");
+                    if (!toggle || toggle.dataset.bound === "1") return;
+                    toggle.dataset.bound = "1";
+                    toggle.addEventListener("click", (event) => {
+                        const btn = event.target.closest(".theme-btn");
+                        if (!btn) return;
+                        const nextTheme = btn.getAttribute("data-theme");
+                        applyTheme(nextTheme);
+                    });
+                }
+
+                initTheme();
+                bindToggle();
+            })();
+        </script>
+        """,
+        height=0,
+        width=0,
     )
 
 
