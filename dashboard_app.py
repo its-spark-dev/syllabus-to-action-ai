@@ -175,7 +175,14 @@ def _inject_styles() -> None:
                 min-height: 146px;
             }
             div[class*="st-key-card_workload_chart"] {
-                min-height: 520px;
+                display: flex;
+                flex-direction: column;
+            }
+            .workload-content {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
             }
             div[class*="st-key-card_kpi_"] .stMarkdown {
                 margin: 0 !important;
@@ -915,12 +922,14 @@ def render_workload_chart(
                 zeroline=False,
             )
         st.markdown('<div class="chart-kicker">AI Structural Load Analysis</div>', unsafe_allow_html=True)
+        st.markdown('<div class="workload-content">', unsafe_allow_html=True)
         st.plotly_chart(
             fig,
             use_container_width=True,
             config={"displayModeBar": False, "responsive": True},
         )
         st.markdown('<div class="chart-caption">AI detected stress acceleration before peak.</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 
 def render_grading_chart(study_guide: Dict[str, Dict[str, object]]) -> None:
