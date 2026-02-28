@@ -1,6 +1,12 @@
 # Changelog
 
 ## [Unreleased]
+- Refactored dashboard card rendering in `dashboard_app.py` to use keyed Streamlit containers (`st.container(key=...)`) instead of HTML open/close wrappers, fixing cases where Plotly/table blocks rendered outside card boundaries.
+- Added container-key-scoped glass card styling for dashboard sections (charts, What-if, AI panels, detailed tables), including scoped `risk-red` variants for risk-focused cards.
+- Added KPI-card-only markdown reset to neutralize Streamlit default `<p>` margins:
+  - `div[class*="st-key-card_kpi_"] .stMarkdown { margin: 0 !important; }`
+  - `div[class*="st-key-card_kpi_"] .stMarkdown p { margin: 0 !important; padding: 0 !important; }`
+- Replaced inline chart/panel spacing styles with reusable CSS classes (`.chart-kicker`, `.chart-caption`, `.risk-signal-bar`) and tuned KPI typography rhythm (`.ai-badge`, `.kpi-*`) for stable vertical spacing.
 - Added deterministic `compute_ai_intelligence()` layer and appended `ai_intelligence` to AI outputs without changing deterministic scheduling logic.
 - Added AI intelligence outputs:
   - `stress_score`, `acceleration_index`, `burnout_probability`

@@ -81,21 +81,25 @@ def _inject_styles() -> None:
     st.markdown(
         """
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
             .stApp {
                 background:
-                    radial-gradient(1200px 680px at 10% -12%, rgba(96, 152, 255, 0.33), transparent 63%),
-                    radial-gradient(980px 560px at 84% 8%, rgba(66, 179, 255, 0.20), transparent 60%),
-                    radial-gradient(760px 460px at 48% 102%, rgba(33, 79, 170, 0.30), transparent 72%),
-                    linear-gradient(160deg, #061026 0%, #091832 42%, #0C1F45 72%, #08132C 100%);
+                    radial-gradient(1200px 760px at 50% 50%, transparent 46%, rgba(0, 0, 0, 0.28) 100%),
+                    radial-gradient(980px 560px at 88% 6%, rgba(69, 214, 255, 0.30), transparent 60%),
+                    radial-gradient(860px 520px at 12% 94%, rgba(108, 92, 255, 0.20), transparent 62%),
+                    radial-gradient(740px 420px at 18% 84%, rgba(44, 219, 190, 0.14), transparent 66%),
+                    linear-gradient(158deg, #030818 0%, #061230 42%, #0A1B45 72%, #07112A 100%);
                 color: #E8EEFF;
+                font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                font-weight: 300;
             }
             [data-testid="stHeader"] {
                 background: rgba(0, 0, 0, 0);
             }
             .block-container {
                 max-width: 1240px;
-                padding-top: 1.8rem;
-                padding-bottom: 2rem;
+                padding-top: 1.2rem;
+                padding-bottom: 1.75rem;
             }
             [data-testid="stHorizontalBlock"] {
                 gap: 1.2rem;
@@ -103,8 +107,8 @@ def _inject_styles() -> None:
             }
             .hero-header {
                 position: relative;
-                padding: 1.2rem 1.4rem 1.25rem;
-                margin-bottom: 1.2rem;
+                padding: 1.06rem 1.35rem 1.12rem;
+                margin-bottom: 0.95rem;
             }
             .hero-header::before {
                 content: "";
@@ -117,83 +121,75 @@ def _inject_styles() -> None:
                 z-index: 0;
                 pointer-events: none;
             }
-            .hero-header::after {
-                content: "";
-                position: absolute;
-                inset: auto 16% -30px 16%;
-                height: 56px;
-                border-radius: 999px;
-                background: radial-gradient(ellipse at center, rgba(97, 143, 255, 0.32) 0%, transparent 75%);
-                filter: blur(10px);
-                z-index: 0;
-                pointer-events: none;
-            }
             .hero-header > * {
                 position: relative;
                 z-index: 1;
             }
-            .glass-card {
-                background: rgba(15, 25, 55, 0.75);
-                border: 1px solid rgba(255, 255, 255, 0.08);
-                border-radius: 28px;
-                backdrop-filter: blur(14px);
-                -webkit-backdrop-filter: blur(14px);
-                box-shadow:
-                    0 22px 48px rgba(4, 11, 34, 0.52),
-                    0 0 44px rgba(92, 148, 255, 0.16),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-                    inset 0 -14px 24px rgba(2, 6, 20, 0.35);
-                padding: 1.15rem 1.25rem;
-                margin-bottom: 1.2rem;
-                transition: transform 0.26s ease, box-shadow 0.26s ease, border-color 0.26s ease;
+            .divider-line {
+                height: 1px;
+                background: rgba(255,255,255,0.15);
+                margin: 32px 0;
             }
-            .interactive-card:hover {
-                transform: translateY(-5px);
-                border-color: rgba(182, 213, 255, 0.2);
+            .glass-card,
+            div[class*="st-key-card_"] {
+                background: rgba(12, 21, 46, 0.66);
+                border: 1px solid rgba(198, 220, 255, 0.12);
+                border-radius: 22px;
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
                 box-shadow:
-                    0 26px 54px rgba(4, 11, 34, 0.6),
-                    0 0 48px rgba(105, 163, 255, 0.22),
+                    0 18px 36px rgba(3, 10, 30, 0.4),
+                    0 0 22px rgba(86, 145, 255, 0.09),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+                    inset 0 -8px 14px rgba(3, 8, 24, 0.28);
+                padding: 1.25rem;
+                margin-bottom: 0.7rem;
+                transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+                overflow: hidden;
+            }
+            div[class*="st-key-card_"]:has(> div[data-testid="stPlotlyChart"]),
+            div[class*="st-key-card_"]:has(> div[data-testid="stTable"]),
+            div[class*="st-key-card_"]:has(> div[data-testid="stDataFrame"]) {
+                background: rgba(12, 21, 46, 0.60);
+                backdrop-filter: blur(8px);
+            }
+            div[class*="st-key-card_"]:hover {
+                transform: translateY(-4px);
+                border-color: rgba(182, 213, 255, 0.22);
+                box-shadow:
+                    0 24px 50px rgba(4, 11, 34, 0.56),
+                    0 0 36px rgba(105, 163, 255, 0.19),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+                    inset 0 -10px 18px rgba(2, 6, 20, 0.39);
+            }
+            div[class*="st-key-card_"][class*="risk-red"] {
+                border-color: rgba(255, 111, 111, 0.28);
+                box-shadow:
+                    0 24px 52px rgba(22, 5, 9, 0.5),
+                    0 0 54px rgba(239, 68, 68, 0.26),
                     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                    inset 0 -14px 24px rgba(2, 6, 20, 0.4);
+                    inset 0 -14px 24px rgba(45, 5, 8, 0.4);
+            }
+            .intel-card,
+            div[class*="st-key-card_kpi_"] {
+                min-height: 146px;
+            }
+            div[class*="st-key-card_kpi_"] .stMarkdown {
+                margin: 0 !important;
+            }
+            div[class*="st-key-card_kpi_"] .stMarkdown p {
+                margin: 0 !important;
+                padding: 0 !important;
             }
             .dashboard-grid {
                 display: grid;
                 grid-template-columns: repeat(4, minmax(0, 1fr));
-                gap: 1.15rem;
-                margin-bottom: 0.35rem;
-            }
-            .intel-card {
-                position: relative;
-                overflow: hidden;
-                min-height: 146px;
-            }
-            .intel-card::after {
-                content: "";
-                position: absolute;
-                left: 50%;
-                bottom: -24px;
-                width: 72%;
-                height: 44px;
-                transform: translateX(-50%);
-                border-radius: 999px;
-                background: radial-gradient(ellipse at center, rgba(89, 150, 255, 0.32) 0%, rgba(89, 150, 255, 0.06) 52%, transparent 76%);
-                filter: blur(10px);
-                pointer-events: none;
-            }
-            .intel-card.risk-red::after {
-                background: radial-gradient(ellipse at center, rgba(239, 68, 68, 0.42) 0%, rgba(239, 68, 68, 0.10) 52%, transparent 78%);
-            }
-            .intel-card.risk-red {
-                border-color: rgba(255, 111, 111, 0.28);
-                box-shadow:
-                    0 24px 52px rgba(22, 5, 9, 0.5),
-                    0 0 48px rgba(239, 68, 68, 0.24),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                    inset 0 -14px 24px rgba(45, 5, 8, 0.4);
+                gap: 1.02rem;
+                margin-bottom: 0.2rem;
             }
             .ai-badge {
                 display: inline-block;
-                font-size: 0.68rem;
+                font-size: 0.64rem;
                 letter-spacing: 0.08em;
                 text-transform: uppercase;
                 font-weight: 700;
@@ -202,49 +198,71 @@ def _inject_styles() -> None:
                 border: 1px solid rgba(187, 209, 255, 0.35);
                 border-radius: 999px;
                 padding: 0.22rem 0.55rem;
-                margin-bottom: 0.42rem;
+                margin-bottom: 0.4rem;
             }
             .kpi-label {
                 color: #AFC5FF;
                 letter-spacing: 0.04em;
                 font-size: 0.76rem;
                 text-transform: uppercase;
-                margin-bottom: 0.3rem;
+                margin-bottom: 4.8px;
             }
             .kpi-value {
                 color: #FFFFFF;
-                font-size: 1.7rem;
-                font-weight: 700;
+                font-size: 1.86rem;
+                font-weight: 600;
                 line-height: 1.2;
+                margin-bottom: 3.2px;
             }
             .kpi-sub {
                 color: #CFE0FF;
                 font-size: 0.82rem;
-                margin-top: 0.2rem;
+                margin-bottom: 0.25rem;
             }
             .kpi-ai {
                 color: #9EC3FF;
                 font-size: 0.8rem;
-                margin-top: 0.48rem;
+                margin-top: 3.68px;
+                margin-bottom: 16px;
                 line-height: 1.4;
+            }
+            .chart-kicker {
+                font-size: 0.74rem;
+                color: #AFC8FF;
+                margin-bottom: 0.2rem;
+            }
+            .chart-caption {
+                font-size: 0.76rem;
+                color: #AFC8FF;
+                margin-top: -2.4px;
+                margin-bottom: 9.4px;
+            }
+            .risk-signal-bar {
+                height: 0.42rem;
+                border-radius: 999px;
+                background: linear-gradient(90deg, rgba(239,68,68,0.65), rgba(239,68,68,0.05));
+                margin-bottom: 0.55rem;
             }
             .section-title {
                 font-size: 1.08rem;
-                font-weight: 700;
+                font-weight: 500;
                 color: #EAF1FF;
-                margin-bottom: 0.9rem;
+                margin-bottom: 0.5rem;
             }
             .app-title {
                 font-size: 2.15rem;
                 color: #F5F8FF;
-                font-weight: 800;
+                font-weight: 600;
                 margin-bottom: 0.22rem;
-                letter-spacing: 0.01em;
+                letter-spacing: -0.02em;
             }
             .app-subtitle {
                 color: #BFD2FF;
                 margin-bottom: 0;
                 font-size: 0.98rem;
+            }
+            .stApp p, .stApp li, .stApp label {
+                font-weight: 300;
             }
             .stTextArea textarea {
                 background: rgba(9, 20, 45, 0.75) !important;
@@ -270,7 +288,7 @@ def _inject_styles() -> None:
                 50% { transform: scale(1.055); filter: drop-shadow(0 0 7px rgba(166, 242, 255, 0.38)); }
                 100% { transform: scale(1.0); filter: drop-shadow(0 0 3px rgba(166, 242, 255, 0.25)); }
             }
-            .workload-plot .js-plotly-plot .scatterlayer .trace:last-child path {
+            .js-plotly-plot .scatterlayer .trace:last-child path {
                 transform-box: fill-box;
                 transform-origin: center;
                 animation: peakPulse 3.8s ease-in-out infinite;
@@ -357,7 +375,7 @@ def _set_sample_syllabi() -> None:
 def _render_input_panel() -> Tuple[List[str], bool, bool]:
     with st.sidebar:
         st.markdown("### Input")
-        st.button("Load Sample Syllabi", on_click=_set_sample_syllabi, use_container_width=True)
+        st.button("Load Sample Syllabi", on_click=_set_sample_syllabi, width="stretch")
         course_count = st.number_input(
             "Number of courses",
             min_value=1,
@@ -367,9 +385,8 @@ def _render_input_panel() -> Tuple[List[str], bool, bool]:
             key="course_count",
         )
         use_ai = st.checkbox("Use IBM AI for refinement", value=False)
-        generate_clicked = st.button("Generate Dashboard", use_container_width=True)
+        generate_clicked = st.button("Generate Dashboard", width="stretch")
 
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     syllabus_inputs: List[str] = []
     for index in range(int(course_count)):
         syllabus_inputs.append(
@@ -380,7 +397,6 @@ def _render_input_panel() -> Tuple[List[str], bool, bool]:
                 height=160,
             )
         )
-    st.markdown("</div>", unsafe_allow_html=True)
     return syllabus_inputs, use_ai, generate_clicked
 
 
@@ -425,105 +441,99 @@ def _weekly_metrics_to_stress_risk(
 
 
 def _render_peak_breakdown(contributors: List[Dict[str, object]], peak_week: str) -> None:
-    st.markdown('<div class="glass-card interactive-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">Peak Breakdown</div>', unsafe_allow_html=True)
-    if not contributors:
-        st.info("No peak-week contributors detected.")
-        st.markdown("</div>", unsafe_allow_html=True)
-        return
+    with st.container(key="card_peak_breakdown"):
+        st.markdown('<div class="section-title">Peak Breakdown</div>', unsafe_allow_html=True)
+        if not contributors:
+            st.info("No peak-week contributors detected.")
+            return
 
-    st.caption(f"Top contributors for {peak_week}")
-    rows = []
-    for item in contributors:
-        rows.append(
-            {
-                "Task": item.get("task", ""),
-                "Course": item.get("course", ""),
-                "Kind": item.get("kind", ""),
-                "Stress Min": item.get("stress_contribution", 0),
-                "Weight": f"{float(item.get('weight_effective') or 0.0):.1f}%",
-            }
-        )
-    st.table(rows)
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.caption(f"Top contributors for {peak_week}")
+        rows = []
+        for item in contributors:
+            rows.append(
+                {
+                    "Task": item.get("task", ""),
+                    "Course": item.get("course", ""),
+                    "Kind": item.get("kind", ""),
+                    "Stress Min": item.get("stress_contribution", 0),
+                    "Weight": f"{float(item.get('weight_effective') or 0.0):.1f}%",
+                }
+            )
+        st.table(rows)
 
 
 def _render_simulation_results(
     shift_result: Dict[str, object],
     strategy_result: Dict[str, object],
 ) -> None:
-    st.markdown('<div class="glass-card interactive-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">What-if Results</div>', unsafe_allow_html=True)
+    with st.container(key="card_what_if_results"):
+        st.markdown('<div class="section-title">What-if Results</div>', unsafe_allow_html=True)
+        shift_error = shift_result.get("error") if isinstance(shift_result, dict) else None
+        strategy_error = strategy_result.get("error") if isinstance(strategy_result, dict) else None
 
-    shift_error = shift_result.get("error") if isinstance(shift_result, dict) else None
-    strategy_error = strategy_result.get("error") if isinstance(strategy_result, dict) else None
+        left, right = st.columns(2)
+        with left:
+            st.markdown("**Shift Simulation**")
+            if shift_error:
+                st.caption(f"Unavailable: {shift_error}")
+            else:
+                st.write(
+                    f"Peak: {shift_result.get('peak_before', {}).get('week', 'N/A')} -> "
+                    f"{shift_result.get('peak_after', {}).get('week', 'N/A')}"
+                )
+                st.write(f"Delta: {float(shift_result.get('delta_percent') or 0.0):.1f}%")
+                st.write(f"Weeks changed: {int(shift_result.get('changed_week_count') or 0)}")
 
-    left, right = st.columns(2)
-    with left:
-        st.markdown("**Shift Simulation**")
-        if shift_error:
-            st.caption(f"Unavailable: {shift_error}")
-        else:
-            st.write(
-                f"Peak: {shift_result.get('peak_before', {}).get('week', 'N/A')} -> "
-                f"{shift_result.get('peak_after', {}).get('week', 'N/A')}"
-            )
-            st.write(f"Delta: {float(shift_result.get('delta_percent') or 0.0):.1f}%")
-            st.write(f"Weeks changed: {int(shift_result.get('changed_week_count') or 0)}")
+        with right:
+            st.markdown("**Strategy Simulation**")
+            if strategy_error:
+                st.caption(f"Unavailable: {strategy_error}")
+            else:
+                st.write(
+                    f"Peak: {strategy_result.get('peak_before', {}).get('week', 'N/A')} -> "
+                    f"{strategy_result.get('peak_after', {}).get('week', 'N/A')}"
+                )
+                st.write(f"Delta: {float(strategy_result.get('delta_percent') or 0.0):.1f}%")
+                st.write(f"Weeks changed: {int(strategy_result.get('changed_week_count') or 0)}")
 
-    with right:
-        st.markdown("**Strategy Simulation**")
-        if strategy_error:
-            st.caption(f"Unavailable: {strategy_error}")
-        else:
-            st.write(
-                f"Peak: {strategy_result.get('peak_before', {}).get('week', 'N/A')} -> "
-                f"{strategy_result.get('peak_after', {}).get('week', 'N/A')}"
-            )
-            st.write(f"Delta: {float(strategy_result.get('delta_percent') or 0.0):.1f}%")
-            st.write(f"Weeks changed: {int(strategy_result.get('changed_week_count') or 0)}")
-
-    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def _render_ai_intelligence_card(ai_payload: Dict[str, object]) -> None:
-    st.markdown('<div class="glass-card interactive-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">AI Intelligence Explanation</div>', unsafe_allow_html=True)
-    if not isinstance(ai_payload, dict):
-        st.info("AI intelligence is unavailable.")
-        st.markdown("</div>", unsafe_allow_html=True)
-        return
+    with st.container(key="card_ai_intelligence"):
+        st.markdown('<div class="section-title">AI Intelligence Explanation</div>', unsafe_allow_html=True)
+        if not isinstance(ai_payload, dict):
+            st.info("AI intelligence is unavailable.")
+            return
 
-    kpis = ai_payload.get("kpis", {})
-    why_risky = ai_payload.get("why_risky", [])
-    simulation_narrative = str(ai_payload.get("simulation_narrative") or "")
-    allocation = ai_payload.get("time_allocation_strategy", {})
+        kpis = ai_payload.get("kpis", {})
+        why_risky = ai_payload.get("why_risky", [])
+        simulation_narrative = str(ai_payload.get("simulation_narrative") or "")
+        allocation = ai_payload.get("time_allocation_strategy", {})
 
-    kpi_cols = st.columns(3)
-    with kpi_cols[0]:
-        st.metric("Burnout %", f"{float(kpis.get('burnout_probability_percent') or 0.0):.1f}")
-    with kpi_cols[1]:
-        st.metric("Acceleration Index", f"{float(kpis.get('stress_acceleration_index') or 0.0):.1f}")
-    with kpi_cols[2]:
-        st.metric("Compression Risk", f"{float(kpis.get('compression_risk_score') or 0.0):.1f}")
+        kpi_cols = st.columns(3)
+        with kpi_cols[0]:
+            st.metric("Burnout %", f"{float(kpis.get('burnout_probability_percent') or 0.0):.1f}")
+        with kpi_cols[1]:
+            st.metric("Acceleration Index", f"{float(kpis.get('stress_acceleration_index') or 0.0):.1f}")
+        with kpi_cols[2]:
+            st.metric("Compression Risk", f"{float(kpis.get('compression_risk_score') or 0.0):.1f}")
 
-    if isinstance(why_risky, list) and why_risky:
-        st.markdown("**Why risky**")
-        for item in why_risky[:4]:
-            st.write(f"- {item}")
+        if isinstance(why_risky, list) and why_risky:
+            st.markdown("**Why risky**")
+            for item in why_risky[:4]:
+                st.write(f"- {item}")
 
-    if simulation_narrative:
-        st.markdown("**Simulation Narrative**")
-        st.write(simulation_narrative)
+        if simulation_narrative:
+            st.markdown("**Simulation Narrative**")
+            st.write(simulation_narrative)
 
-    if isinstance(allocation, dict):
-        st.markdown(
-            "**Recommended Time Allocation** "
-            f"(Exam {float(allocation.get('exam_prep') or 0.0):.1f}% / "
-            f"Projects {float(allocation.get('projects') or 0.0):.1f}% / "
-            f"Homework {float(allocation.get('homework') or 0.0):.1f}%)"
-        )
-    st.markdown("</div>", unsafe_allow_html=True)
+        if isinstance(allocation, dict):
+            st.markdown(
+                "**Recommended Time Allocation** "
+                f"(Exam {float(allocation.get('exam_prep') or 0.0):.1f}% / "
+                f"Projects {float(allocation.get('projects') or 0.0):.1f}% / "
+                f"Homework {float(allocation.get('homework') or 0.0):.1f}%)"
+            )
 
 
 def _collect_upcoming_exam_weight(study_guide: Dict[str, Dict[str, object]]) -> float:
@@ -600,452 +610,436 @@ def _render_kpis(
         ("AI Exam Pressure", f"{upcoming_exam_weight:.0f}%", "Nearest upcoming exam", exam_ai, False),
         ("AI Burnout Risk", burnout_risk, f"{len(weekly_plan)} weeks scheduled", burnout_ai, burnout_risk in {"High Risk", "Critical Risk"}),
     ]
-    cards_html = "".join(
-        (
-            f"<div class=\"glass-card interactive-card intel-card{' risk-red' if is_risk else ''}\">"
-            "<div class=\"ai-badge\">AI Insight</div>"
-            f"<div class=\"kpi-label\">{label}</div>"
-            f"<div class=\"kpi-value\">{value}</div>"
-            f"<div class=\"kpi-sub\">{sub}</div>"
-            f"<div class=\"kpi-ai\">{ai_text}</div>"
-            "</div>"
-        )
-        for label, value, sub, ai_text, is_risk in kpi_data
-    )
-    st.markdown(f"<div class=\"dashboard-grid\">{cards_html}</div>", unsafe_allow_html=True)
+    cols = st.columns(4)
+    for idx, (label, value, sub, ai_text, is_risk) in enumerate(kpi_data):
+        card_key = f"card_kpi_{idx}_risk-red" if is_risk else f"card_kpi_{idx}"
+        with cols[idx]:
+            with st.container(key=card_key):
+                st.markdown('<span class="ai-badge">AI Insight</span>', unsafe_allow_html=True)
+                st.markdown(f'<div class="kpi-label">{label}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="kpi-value">{value}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="kpi-sub">{sub}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="kpi-ai">{ai_text}</div>', unsafe_allow_html=True)
 
 
 def render_workload_chart(
     stress_score_by_week: Dict[str, int],
     risk_by_week: Dict[str, str],
 ) -> None:
-    st.markdown('<div class="glass-card interactive-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">Weekly Workload</div>', unsafe_allow_html=True)
-    if not stress_score_by_week:
-        st.info("No weekly stress data available yet.")
-        st.markdown("</div>", unsafe_allow_html=True)
-        return
+    with st.container(key="card_workload_chart"):
+        st.markdown('<div class="section-title">Weekly Workload</div>', unsafe_allow_html=True)
+        if not stress_score_by_week:
+            st.info("No weekly stress data available yet.")
+            return
 
-    weeks = sorted(stress_score_by_week.keys(), key=_week_sort_key)
-    values = [stress_score_by_week.get(week, 0) for week in weeks]
-    if not weeks:
-        st.info("No weekly labels available.")
-        st.markdown("</div>", unsafe_allow_html=True)
-        return
+        weeks = sorted(stress_score_by_week.keys(), key=_week_sort_key)
+        values = [stress_score_by_week.get(week, 0) for week in weeks]
+        if not weeks:
+            st.info("No weekly labels available.")
+            return
 
-    x_vals = list(range(len(weeks)))
-    avg_stress = sum(values) / len(values)
-    sustainable_limit = max(300.0, avg_stress * 1.15)
+        x_vals = list(range(len(weeks)))
+        avg_stress = sum(values) / len(values)
+        sustainable_limit = max(300.0, avg_stress * 1.15)
 
-    def _risk_state(week: str, value: float) -> str:
-        risk = str(risk_by_week.get(week, "Normal"))
-        if risk == "Critical Risk" or value >= sustainable_limit * 1.14:
-            return "high"
-        if risk == "High Risk" or value >= sustainable_limit * 0.94:
-            return "elevated"
-        return "normal"
+        def _risk_state(week: str, value: float) -> str:
+            risk = str(risk_by_week.get(week, "Normal"))
+            if risk == "Critical Risk" or value >= sustainable_limit * 1.14:
+                return "high"
+            if risk == "High Risk" or value >= sustainable_limit * 0.94:
+                return "elevated"
+            return "normal"
 
-    state_colors = {
-        "normal": "#3FF5FF",
-        "elevated": "#FFA235",
-        "high": "#FF3E56",
-    }
-    states = [_risk_state(week, value) for week, value in zip(weeks, values)]
+        state_colors = {
+            "normal": "#3FF5FF",
+            "elevated": "#FFA235",
+            "high": "#FF3E56",
+        }
+        states = [_risk_state(week, value) for week, value in zip(weeks, values)]
 
-    peak_index = max(range(len(values)), key=lambda idx: values[idx])
-    peak_week = weeks[peak_index]
-    peak_value = values[peak_index]
-    peak_x = x_vals[peak_index]
+        peak_index = max(range(len(values)), key=lambda idx: values[idx])
+        peak_week = weeks[peak_index]
+        peak_value = values[peak_index]
+        peak_x = x_vals[peak_index]
 
-    accel_threshold = max(28.0, avg_stress * 0.17)
-    accel_points = [
-        index
-        for index in range(1, len(values))
-        if (values[index] - values[index - 1]) >= accel_threshold
-    ]
+        accel_threshold = max(28.0, avg_stress * 0.17)
+        accel_points = [
+            index
+            for index in range(1, len(values))
+            if (values[index] - values[index - 1]) >= accel_threshold
+        ]
 
-    fig = go.Figure()
-    # Edge fade for a cinematic glass look.
-    if x_vals:
-        fig.add_vrect(
-            x0=-0.5,
-            x1=0.22,
-            fillcolor="rgba(7, 15, 34, 0.46)",
-            line_width=0,
-            layer="above",
-        )
-        fig.add_vrect(
-            x0=x_vals[-1] - 0.22,
-            x1=x_vals[-1] + 0.5,
-            fillcolor="rgba(7, 15, 34, 0.46)",
-            line_width=0,
-            layer="above",
-        )
-
-    # Overload zone around peak week.
-    fig.add_shape(
-        type="rect",
-        xref="x",
-        yref="paper",
-        x0=peak_x - 0.45,
-        x1=peak_x + 0.45,
-        y0=0.0,
-        y1=1.0,
-        fillcolor="rgba(255, 92, 102, 0.22)",
-        line=dict(width=0),
-        layer="below",
-    )
-    # Faint top fade accent for overload band.
-    fig.add_shape(
-        type="rect",
-        xref="x",
-        yref="paper",
-        x0=peak_x - 0.45,
-        x1=peak_x + 0.45,
-        y0=0.78,
-        y1=1.0,
-        fillcolor="rgba(255, 92, 102, 0.14)",
-        line=dict(width=0),
-        layer="below",
-    )
-    fig.add_shape(
-        type="rect",
-        xref="x",
-        yref="paper",
-        x0=peak_x - 0.45,
-        x1=peak_x + 0.45,
-        y0=0.90,
-        y1=1.0,
-        fillcolor="rgba(255, 92, 102, 0.18)",
-        line=dict(width=0),
-        layer="below",
-    )
-    fig.add_annotation(
-        x=peak_x,
-        y=1.0,
-        yref="paper",
-        text="Overload Zone",
-        showarrow=False,
-        font=dict(color="#FFC0C6", size=11),
-    )
-
-    # Gradient area fill using layered low-opacity fills.
-    fig.add_trace(
-        go.Scatter(
-            x=x_vals,
-            y=values,
-            mode="lines",
-            line=dict(width=0),
-            fill="tozeroy",
-            fillcolor="rgba(95, 184, 255, 0.15)",
-            hoverinfo="skip",
-            showlegend=False,
-        )
-    )
-    fig.add_trace(
-        go.Scatter(
-            x=x_vals,
-            y=[value * 0.62 for value in values],
-            mode="lines",
-            line=dict(width=0),
-            fill="tozeroy",
-            fillcolor="rgba(81, 148, 255, 0.08)",
-            hoverinfo="skip",
-            showlegend=False,
-        )
-    )
-
-    # 3-layer line system: base glow, semi-glow, sharp top stroke.
-    fig.add_trace(
-        go.Scatter(
-            x=x_vals,
-            y=values,
-            mode="lines",
-            line=dict(color="rgba(112, 237, 255, 0.19)", width=30, shape="spline", smoothing=1.25),
-            hoverinfo="skip",
-            showlegend=False,
-        )
-    )
-    fig.add_trace(
-        go.Scatter(
-            x=x_vals,
-            y=values,
-            mode="lines",
-            line=dict(color="rgba(102, 226, 255, 0.34)", width=16, shape="spline", smoothing=1.25),
-            hoverinfo="skip",
-            showlegend=False,
-        )
-    )
-
-    for state, label in (("normal", "Normal"), ("elevated", "Elevated"), ("high", "High Risk")):
-        y_state = [value if state_name == state else None for value, state_name in zip(values, states)]
-        fig.add_trace(
-            go.Scatter(
-                x=x_vals,
-                y=y_state,
-                mode="lines+markers",
-                connectgaps=False,
-                line=dict(color=state_colors[state], width=5.3, shape="spline", smoothing=1.25),
-                marker=dict(
-                    size=9,
-                    color=state_colors[state],
-                    line=dict(color="rgba(255,255,255,0.38)", width=1),
-                ),
-                customdata=[[week] for week in weeks],
-                hovertemplate="%{customdata[0]}<br>Stress: %{y:.0f}<extra>" + label + "</extra>",
-                name=label,
+        fig = go.Figure()
+        # Edge fade for a cinematic glass look.
+        if x_vals:
+            fig.add_vrect(
+                x0=-0.5,
+                x1=0.22,
+                fillcolor="rgba(7, 15, 34, 0.46)",
+                line_width=0,
+                layer="above",
             )
-        )
-
-    # Acceleration arrows where stress ramps rapidly.
-    if accel_points:
-        fig.add_trace(
-            go.Scatter(
-                x=[x_vals[idx] for idx in accel_points],
-                y=[values[idx] + max(8.0, values[idx] * 0.04) for idx in accel_points],
-                mode="markers",
-                marker=dict(
-                    symbol="triangle-up",
-                    size=10,
-                    color="#FFD27D",
-                    line=dict(color="#FFEAC2", width=1),
-                ),
-                customdata=[[weeks[idx], values[idx] - values[idx - 1]] for idx in accel_points],
-                hovertemplate="%{customdata[0]}<br>Stress acceleration: +%{customdata[1]:.0f}<extra></extra>",
-                name="Acceleration",
+            fig.add_vrect(
+                x0=x_vals[-1] - 0.22,
+                x1=x_vals[-1] + 0.5,
+                fillcolor="rgba(7, 15, 34, 0.46)",
+                line_width=0,
+                layer="above",
             )
-        )
 
-    # Sustainable threshold line.
-    fig.add_hline(
-        y=sustainable_limit,
-        line=dict(color="rgba(136, 188, 255, 0.46)", width=0.9, dash="dot"),
-        annotation_text="Sustainable Limit",
-        annotation_position="top left",
-        annotation_font=dict(color="#C8DDFF", size=11),
-    )
+            # Overload zone around peak week.
+            fig.add_shape(
+                type="rect",
+                xref="x",
+                yref="paper",
+                x0=peak_x - 0.45,
+                x1=peak_x + 0.45,
+                y0=0.0,
+                y1=1.0,
+                fillcolor="rgba(255, 92, 102, 0.22)",
+                line=dict(width=0),
+                layer="below",
+            )
+            # Faint top fade accent for overload band.
+            fig.add_shape(
+                type="rect",
+                xref="x",
+                yref="paper",
+                x0=peak_x - 0.45,
+                x1=peak_x + 0.45,
+                y0=0.78,
+                y1=1.0,
+                fillcolor="rgba(255, 92, 102, 0.14)",
+                line=dict(width=0),
+                layer="below",
+            )
+            fig.add_shape(
+                type="rect",
+                xref="x",
+                yref="paper",
+                x0=peak_x - 0.45,
+                x1=peak_x + 0.45,
+                y0=0.90,
+                y1=1.0,
+                fillcolor="rgba(255, 92, 102, 0.18)",
+                line=dict(width=0),
+                layer="below",
+            )
+            fig.add_annotation(
+                x=peak_x,
+                y=1.0,
+                yref="paper",
+                text="Overload Zone",
+                showarrow=False,
+                font=dict(color="#FFC0C6", size=11),
+            )
 
-    # Peak highlight with pulse-like layered markers.
-    fig.add_trace(
-        go.Scatter(
-            x=[peak_x],
-            y=[peak_value],
-            mode="markers",
-            marker=dict(size=42, color="rgba(145, 246, 255, 0.16)", line=dict(width=0)),
-            showlegend=False,
-            hoverinfo="skip",
-        )
-    )
-    fig.add_trace(
-        go.Scatter(
-            x=[peak_x],
-            y=[peak_value],
-            mode="markers",
-            marker=dict(size=24, color="rgba(157, 247, 255, 0.34)", line=dict(width=0)),
-            showlegend=False,
-            hoverinfo="skip",
-        )
-    )
-    fig.add_trace(
-        go.Scatter(
-            x=[peak_x],
-            y=[peak_value],
-            mode="markers",
-            marker=dict(size=12, color="#D8FBFF", line=dict(color="#FFFFFF", width=2.0)),
-            showlegend=False,
-            customdata=[[peak_week]],
-            hovertemplate="Peak week: %{customdata[0]}<br>Stress: %{y:.0f}<extra></extra>",
-        )
-    )
-    fig.add_annotation(
-        x=peak_x,
-        y=peak_value,
-        text=f"Peak: {peak_week} ({peak_value})",
-        showarrow=True,
-        arrowhead=2,
-        arrowsize=1,
-        arrowwidth=1,
-        arrowcolor="rgba(177, 216, 255, 0.62)",
-        ax=0,
-        ay=-52,
-        font=dict(color="#E8F6FF", size=12),
-        bgcolor="rgba(14, 28, 58, 0.82)",
-        bordercolor="rgba(169, 206, 255, 0.45)",
-        borderwidth=1,
-        borderpad=6,
-    )
+            # Gradient area fill using layered low-opacity fills.
+            fig.add_trace(
+                go.Scatter(
+                    x=x_vals,
+                    y=values,
+                    mode="lines",
+                    line=dict(width=0),
+                    fill="tozeroy",
+                    fillcolor="rgba(95, 184, 255, 0.15)",
+                    hoverinfo="skip",
+                    showlegend=False,
+                )
+            )
+            fig.add_trace(
+                go.Scatter(
+                    x=x_vals,
+                    y=[value * 0.62 for value in values],
+                    mode="lines",
+                    line=dict(width=0),
+                    fill="tozeroy",
+                    fillcolor="rgba(81, 148, 255, 0.08)",
+                    hoverinfo="skip",
+                    showlegend=False,
+                )
+            )
 
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        margin=dict(l=8, r=10, t=16, b=8),
-        height=350,
-        yaxis_title="Stress / Load Score",
-        xaxis_title="Week",
-        hovermode="x unified",
-        legend=dict(orientation="h", yanchor="bottom", y=1.03, xanchor="left", x=0, borderwidth=0),
-        font=dict(color="#DDE9FF"),
-        hoverlabel=dict(
-            bgcolor="rgba(12, 24, 54, 0.92)",
-            bordercolor="rgba(136, 188, 255, 0.44)",
-            font=dict(color="#E8F4FF", size=12),
-        ),
-    )
-    fig.update_yaxes(
-        gridcolor="rgba(160, 196, 255, 0.11)",
-        griddash="dot",
-        zeroline=False,
-        gridwidth=1,
-    )
-    fig.update_xaxes(
-        tickmode="array",
-        tickvals=x_vals,
-        ticktext=weeks,
-        gridcolor="rgba(160, 196, 255, 0.08)",
-        griddash="dot",
-        zeroline=False,
-    )
-    st.markdown(
-        "<div style='font-size:0.74rem;color:#AFC8FF;margin-bottom:0.2rem;'>AI Structural Load Analysis</div>",
-        unsafe_allow_html=True,
-    )
-    st.markdown('<div class="workload-plot">', unsafe_allow_html=True)
-    st.plotly_chart(
-        fig,
-        use_container_width=True,
-        config={"displayModeBar": False, "responsive": True},
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown(
-        "<div style='font-size:0.76rem;color:#AFC8FF;margin-top:-0.15rem;'>AI detected stress acceleration before peak.</div>",
-        unsafe_allow_html=True,
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
+            # 3-layer line system: base glow, semi-glow, sharp top stroke.
+            fig.add_trace(
+                go.Scatter(
+                    x=x_vals,
+                    y=values,
+                    mode="lines",
+                    line=dict(color="rgba(112, 237, 255, 0.19)", width=30, shape="spline", smoothing=1.25),
+                    hoverinfo="skip",
+                    showlegend=False,
+                )
+            )
+            fig.add_trace(
+                go.Scatter(
+                    x=x_vals,
+                    y=values,
+                    mode="lines",
+                    line=dict(color="rgba(102, 226, 255, 0.34)", width=16, shape="spline", smoothing=1.25),
+                    hoverinfo="skip",
+                    showlegend=False,
+                )
+            )
+
+            for state, label in (("normal", "Normal"), ("elevated", "Elevated"), ("high", "High Risk")):
+                y_state = [value if state_name == state else None for value, state_name in zip(values, states)]
+                fig.add_trace(
+                    go.Scatter(
+                        x=x_vals,
+                        y=y_state,
+                        mode="lines+markers",
+                        connectgaps=False,
+                        line=dict(color=state_colors[state], width=5.3, shape="spline", smoothing=1.25),
+                        marker=dict(
+                            size=9,
+                            color=state_colors[state],
+                            line=dict(color="rgba(255,255,255,0.38)", width=1),
+                        ),
+                        customdata=[[week] for week in weeks],
+                        hovertemplate="%{customdata[0]}<br>Stress: %{y:.0f}<extra>" + label + "</extra>",
+                        name=label,
+                    )
+                )
+
+            # Acceleration arrows where stress ramps rapidly.
+            if accel_points:
+                fig.add_trace(
+                    go.Scatter(
+                        x=[x_vals[idx] for idx in accel_points],
+                        y=[values[idx] + max(8.0, values[idx] * 0.04) for idx in accel_points],
+                        mode="markers",
+                        marker=dict(
+                            symbol="triangle-up",
+                            size=10,
+                            color="#FFD27D",
+                            line=dict(color="#FFEAC2", width=1),
+                        ),
+                        customdata=[[weeks[idx], values[idx] - values[idx - 1]] for idx in accel_points],
+                        hovertemplate="%{customdata[0]}<br>Stress acceleration: +%{customdata[1]:.0f}<extra></extra>",
+                        name="Acceleration",
+                    )
+                )
+
+            # Sustainable threshold line.
+            fig.add_hline(
+                y=sustainable_limit,
+                line=dict(color="rgba(136, 188, 255, 0.46)", width=0.9, dash="dot"),
+                annotation_text="Sustainable Limit",
+                annotation_position="top left",
+                annotation_font=dict(color="#C8DDFF", size=11),
+            )
+
+            # Peak highlight with pulse-like layered markers.
+            fig.add_trace(
+                go.Scatter(
+                    x=[peak_x],
+                    y=[peak_value],
+                    mode="markers",
+                    marker=dict(size=42, color="rgba(145, 246, 255, 0.16)", line=dict(width=0)),
+                    showlegend=False,
+                    hoverinfo="skip",
+                )
+            )
+            fig.add_trace(
+                go.Scatter(
+                    x=[peak_x],
+                    y=[peak_value],
+                    mode="markers",
+                    marker=dict(size=24, color="rgba(157, 247, 255, 0.34)", line=dict(width=0)),
+                    showlegend=False,
+                    hoverinfo="skip",
+                )
+            )
+            fig.add_trace(
+                go.Scatter(
+                    x=[peak_x],
+                    y=[peak_value],
+                    mode="markers",
+                    marker=dict(size=12, color="#D8FBFF", line=dict(color="#FFFFFF", width=2.0)),
+                    showlegend=False,
+                    customdata=[[peak_week]],
+                    hovertemplate="Peak week: %{customdata[0]}<br>Stress: %{y:.0f}<extra></extra>",
+                )
+            )
+            fig.add_annotation(
+                x=peak_x,
+                y=peak_value,
+                text=f"Peak: {peak_week} ({peak_value})",
+                showarrow=True,
+                arrowhead=2,
+                arrowsize=1,
+                arrowwidth=1,
+                arrowcolor="rgba(177, 216, 255, 0.62)",
+                ax=0,
+                ay=-52,
+                font=dict(color="#E8F6FF", size=12),
+                bgcolor="rgba(14, 28, 58, 0.82)",
+                bordercolor="rgba(169, 206, 255, 0.45)",
+                borderwidth=1,
+                borderpad=6,
+            )
+
+            fig.update_layout(
+                template="plotly_dark",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                margin=dict(l=8, r=10, t=16, b=8),
+                height=350,
+                yaxis_title="Stress / Load Score",
+                xaxis_title="Week",
+                hovermode="x unified",
+                legend=dict(orientation="h", yanchor="bottom", y=1.03, xanchor="left", x=0, borderwidth=0),
+                font=dict(color="#DDE9FF"),
+                hoverlabel=dict(
+                    bgcolor="rgba(12, 24, 54, 0.92)",
+                    bordercolor="rgba(136, 188, 255, 0.44)",
+                    font=dict(color="#E8F4FF", size=12),
+                ),
+            )
+            fig.update_yaxes(
+                gridcolor="rgba(160, 196, 255, 0.11)",
+                griddash="dot",
+                zeroline=False,
+                gridwidth=1,
+            )
+            fig.update_xaxes(
+                tickmode="array",
+                tickvals=x_vals,
+                ticktext=weeks,
+                gridcolor="rgba(160, 196, 255, 0.08)",
+                griddash="dot",
+                zeroline=False,
+            )
+        st.markdown('<div class="chart-kicker">AI Structural Load Analysis</div>', unsafe_allow_html=True)
+        st.plotly_chart(
+            fig,
+            use_container_width=True,
+            config={"displayModeBar": False, "responsive": True},
+        )
+        st.markdown('<div class="chart-caption">AI detected stress acceleration before peak.</div>', unsafe_allow_html=True)
 
 
 def render_grading_chart(study_guide: Dict[str, Dict[str, object]]) -> None:
-    st.markdown('<div class="glass-card interactive-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">Grading Distribution by Course</div>', unsafe_allow_html=True)
-    course_distributions: Dict[str, Dict[str, float]] = {}
-    for course_name, info in study_guide.items():
-        grading_breakdown = info.get("grading_breakdown", {})
-        if not isinstance(grading_breakdown, dict):
-            continue
-        clean = {
-            str(label).strip() or "Other": float(weight)
-            for label, weight in grading_breakdown.items()
-            if isinstance(weight, (int, float)) and float(weight) > 0
-        }
-        if clean:
-            course_distributions[course_name] = clean
+    with st.container(key="card_grading_chart"):
+        st.markdown('<div class="section-title">Grading Distribution by Course</div>', unsafe_allow_html=True)
+        course_distributions: Dict[str, Dict[str, float]] = {}
+        for course_name, info in study_guide.items():
+            grading_breakdown = info.get("grading_breakdown", {})
+            if not isinstance(grading_breakdown, dict):
+                continue
+            clean = {
+                str(label).strip() or "Other": float(weight)
+                for label, weight in grading_breakdown.items()
+                if isinstance(weight, (int, float)) and float(weight) > 0
+            }
+            if clean:
+                course_distributions[course_name] = clean
 
-    if not course_distributions:
-        st.info("No grading distribution data available.")
-        st.markdown("</div>", unsafe_allow_html=True)
-        return
+        if not course_distributions:
+            st.info("No grading distribution data available.")
+            return
 
-    st.caption("AI Weight Sensitivity Model")
-    course_names = list(course_distributions.keys())
-    selected_course = st.selectbox(
-        "Course",
-        course_names,
-        label_visibility="collapsed",
-        key="grading_course_selector",
-    )
-    distribution = course_distributions[selected_course]
-    labels = list(distribution.keys())
-    values = list(distribution.values())
-    total_weight = sum(values)
-    max_weight = max(values) if values else 1.0
-    impact_scores = [(value / max_weight) * 100.0 for value in values]
-    customdata = [[value, impact] for value, impact in zip(values, impact_scores)]
-    colors = [NEON_CHART_COLORS[i % len(NEON_CHART_COLORS)] for i in range(len(labels))]
+        st.caption("AI Weight Sensitivity Model")
+        course_names = list(course_distributions.keys())
+        selected_course = st.selectbox(
+            "Course",
+            course_names,
+            label_visibility="collapsed",
+            key="grading_course_selector",
+        )
+        distribution = course_distributions[selected_course]
+        labels = list(distribution.keys())
+        values = list(distribution.values())
+        total_weight = sum(values)
+        max_weight = max(values) if values else 1.0
+        impact_scores = [(value / max_weight) * 100.0 for value in values]
+        customdata = [[value, impact] for value, impact in zip(values, impact_scores)]
+        colors = [NEON_CHART_COLORS[i % len(NEON_CHART_COLORS)] for i in range(len(labels))]
 
-    fig = go.Figure(
-        data=[
-            go.Pie(
-                labels=labels,
-                values=values,
-                hole=0.68,
-                textinfo="percent",
-                textposition="inside",
-                insidetextfont=dict(size=12, color="#F4FAFF"),
-                marker=dict(colors=colors, line=dict(color="rgba(11,22,44,0.96)", width=2)),
-                sort=False,
-                pull=[0.014] * len(labels),
-                customdata=customdata,
-                hovertemplate=(
-                    "<b>%{label}</b><br>"
-                    "Weight: %{customdata[0]:.1f}%<br>"
-                    "Relative Impact: %{customdata[1]:.0f}<extra></extra>"
-                ),
-            )
-        ]
-    )
-    # Soft radial glow + subtle lighting layers behind donut.
-    fig.add_shape(
-        type="circle",
-        xref="paper",
-        yref="paper",
-        x0=0.13,
-        y0=0.13,
-        x1=0.87,
-        y1=0.87,
-        fillcolor="rgba(92, 150, 255, 0.066)",
-        line=dict(width=0),
-        layer="below",
-    )
-    fig.add_shape(
-        type="circle",
-        xref="paper",
-        yref="paper",
-        x0=0.21,
-        y0=0.21,
-        x1=0.79,
-        y1=0.79,
-        fillcolor="rgba(138, 196, 255, 0.03)",
-        line=dict(width=0),
-        layer="below",
-    )
-    fig.add_annotation(
-        text=f"<b>{selected_course}</b><br>Total Weight {total_weight:.0f}%",
-        x=0.5,
-        y=0.5,
-        showarrow=False,
-        font=dict(color="#EAF4FF", size=12),
-    )
-    fig.update_layout(
-        template="plotly_dark",
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        margin=dict(l=10, r=10, t=16, b=10),
-        height=340,
-        showlegend=True,
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=-0.12,
-            xanchor="center",
+        fig = go.Figure(
+            data=[
+                go.Pie(
+                    labels=labels,
+                    values=values,
+                    hole=0.68,
+                    textinfo="percent",
+                    textposition="inside",
+                    insidetextfont=dict(size=12, color="#F4FAFF"),
+                    marker=dict(colors=colors, line=dict(color="rgba(11,22,44,0.96)", width=2)),
+                    sort=False,
+                    pull=[0.014] * len(labels),
+                    customdata=customdata,
+                    hovertemplate=(
+                        "<b>%{label}</b><br>"
+                        "Weight: %{customdata[0]:.1f}%<br>"
+                        "Relative Impact: %{customdata[1]:.0f}<extra></extra>"
+                    ),
+                )
+            ]
+        )
+        # Soft radial glow + subtle lighting layers behind donut.
+        fig.add_shape(
+            type="circle",
+            xref="paper",
+            yref="paper",
+            x0=0.13,
+            y0=0.13,
+            x1=0.87,
+            y1=0.87,
+            fillcolor="rgba(92, 150, 255, 0.066)",
+            line=dict(width=0),
+            layer="below",
+        )
+        fig.add_shape(
+            type="circle",
+            xref="paper",
+            yref="paper",
+            x0=0.21,
+            y0=0.21,
+            x1=0.79,
+            y1=0.79,
+            fillcolor="rgba(138, 196, 255, 0.03)",
+            line=dict(width=0),
+            layer="below",
+        )
+        fig.add_annotation(
+            text=f"<b>{selected_course}</b><br>Total Weight {total_weight:.0f}%",
             x=0.5,
-            font=dict(color="#CFE0FF", size=11),
-            bgcolor="rgba(0,0,0,0)",
-            borderwidth=0,
-        ),
-        font=dict(color="#DDE9FF"),
-        transition=dict(duration=420, easing="cubic-in-out"),
-        hoverlabel=dict(
-            bgcolor="rgba(12, 24, 54, 0.92)",
-            bordercolor="rgba(160, 204, 255, 0.38)",
-            font=dict(color="#E8F4FF", size=12),
-        ),
-    )
-    st.plotly_chart(
-        fig,
-        use_container_width=True,
-        config={"displayModeBar": False, "responsive": True},
-    )
-    st.markdown("</div>", unsafe_allow_html=True)
+            y=0.5,
+            showarrow=False,
+            font=dict(color="#EAF4FF", size=12),
+        )
+        fig.update_layout(
+            template="plotly_dark",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            margin=dict(l=10, r=10, t=16, b=10),
+            height=340,
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=-0.12,
+                xanchor="center",
+                x=0.5,
+                font=dict(color="#CFE0FF", size=11),
+                bgcolor="rgba(0,0,0,0)",
+                borderwidth=0,
+            ),
+            font=dict(color="#DDE9FF"),
+            transition=dict(duration=420, easing="cubic-in-out"),
+            hoverlabel=dict(
+                bgcolor="rgba(12, 24, 54, 0.92)",
+                bordercolor="rgba(160, 204, 255, 0.38)",
+                font=dict(color="#E8F4FF", size=12),
+            ),
+        )
+        st.plotly_chart(
+            fig,
+            use_container_width=True,
+            config={"displayModeBar": False, "responsive": True},
+        )
 
 
 def _render_ai_strategy_card(
@@ -1054,33 +1048,32 @@ def _render_ai_strategy_card(
     risk_by_week: Dict[str, str],
     study_guide: Dict[str, Dict[str, object]],
 ) -> None:
-    st.markdown('<div class="glass-card interactive-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">AI Strategy</div>', unsafe_allow_html=True)
+    with st.container(key="card_ai_strategy"):
+        st.markdown('<div class="section-title">AI Strategy</div>', unsafe_allow_html=True)
 
-    weeks_sorted = sorted(stress_score_by_week.keys(), key=_week_sort_key)
-    peak_week = max(weeks_sorted, key=lambda w: stress_score_by_week.get(w, 0)) if weeks_sorted else None
-    peak_risk = risk_by_week.get(peak_week, "Normal") if peak_week else "Normal"
+        weeks_sorted = sorted(stress_score_by_week.keys(), key=_week_sort_key)
+        peak_week = max(weeks_sorted, key=lambda w: stress_score_by_week.get(w, 0)) if weeks_sorted else None
+        peak_risk = risk_by_week.get(peak_week, "Normal") if peak_week else "Normal"
 
-    tactics: List[str] = []
-    warnings: List[str] = []
-    for info in study_guide.values():
-        tactics.extend([str(item) for item in info.get("tactical_tips", []) if isinstance(item, str)])
-        warnings.extend([str(item) for item in info.get("warnings", []) if isinstance(item, str)])
+        tactics: List[str] = []
+        warnings: List[str] = []
+        for info in study_guide.values():
+            tactics.extend([str(item) for item in info.get("tactical_tips", []) if isinstance(item, str)])
+            warnings.extend([str(item) for item in info.get("warnings", []) if isinstance(item, str)])
 
-    tactic_text = " ".join(tactics[:2]) if tactics else "Focus first on the nearest high-weight assessments."
-    warning_text = warnings[0] if warnings else "No immediate structural grading issues detected."
+        tactic_text = " ".join(tactics[:2]) if tactics else "Focus first on the nearest high-weight assessments."
+        warning_text = warnings[0] if warnings else "No immediate structural grading issues detected."
 
-    st.markdown(
-        (
-            f"**Execution focus:** Prioritize tasks in **{peak_week or 'the earliest active week'}** "
-            f"where risk is **{peak_risk}**. Maintain daily progress on high-priority tasks and "
-            f"avoid deferring exam preparation to the last week."
+        st.markdown(
+            (
+                f"**Execution focus:** Prioritize tasks in **{peak_week or 'the earliest active week'}** "
+                f"where risk is **{peak_risk}**. Maintain daily progress on high-priority tasks and "
+                f"avoid deferring exam preparation to the last week."
+            )
         )
-    )
-    st.markdown(f"**Tactical note:** {tactic_text}")
-    st.markdown(f"**Guardrail:** {warning_text}")
-    st.markdown(f"**Plan coverage:** {sum(len(tasks) for tasks in weekly_plan.values())} scheduled tasks.")
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(f"**Tactical note:** {tactic_text}")
+        st.markdown(f"**Guardrail:** {warning_text}")
+        st.markdown(f"**Plan coverage:** {sum(len(tasks) for tasks in weekly_plan.values())} scheduled tasks.")
 
 
 def _render_ai_insight_panel(
@@ -1089,39 +1082,39 @@ def _render_ai_insight_panel(
     risk_by_week: Dict[str, str],
     study_guide: Dict[str, Dict[str, object]],
 ) -> None:
-    weeks_sorted = sorted(stress_score_by_week.keys(), key=_week_sort_key)
-    burnout_risk = "Normal"
-    if risk_by_week:
-        burnout_risk = max(risk_by_week.values(), key=lambda item: RISK_LEVEL_ORDER.get(item, 0))
-    hot_weeks = sum(1 for risk in risk_by_week.values() if risk in {"Elevated", "High Risk", "Critical Risk"})
-    total_tasks = sum(len(tasks) for tasks in weekly_plan.values())
-    max_stress = max(stress_score_by_week.values()) if stress_score_by_week else 0
-    peak_week = max(weeks_sorted, key=lambda w: stress_score_by_week.get(w, 0)) if weeks_sorted else "N/A"
+    with st.container(key="card_ai_insight_risk-red"):
+        weeks_sorted = sorted(stress_score_by_week.keys(), key=_week_sort_key)
+        burnout_risk = "Normal"
+        if risk_by_week:
+            burnout_risk = max(risk_by_week.values(), key=lambda item: RISK_LEVEL_ORDER.get(item, 0))
+        hot_weeks = sum(1 for risk in risk_by_week.values() if risk in {"Elevated", "High Risk", "Critical Risk"})
+        total_tasks = sum(len(tasks) for tasks in weekly_plan.values())
+        max_stress = max(stress_score_by_week.values()) if stress_score_by_week else 0
+        peak_week = max(weeks_sorted, key=lambda w: stress_score_by_week.get(w, 0)) if weeks_sorted else "N/A"
 
-    upcoming_exam_weight = _collect_upcoming_exam_weight(study_guide)
-    strategic_move = "Maintain steady execution across weekly priorities."
-    if burnout_risk == "Critical Risk":
-        strategic_move = "Aggressively front-load exam prep and reduce parallel project load."
-    elif burnout_risk == "High Risk":
-        strategic_move = "Create workload buffers before the peak week and lock deep-work blocks."
-    elif upcoming_exam_weight >= 25:
-        strategic_move = "Reallocate study time toward high-weight exam preparation now."
+        upcoming_exam_weight = _collect_upcoming_exam_weight(study_guide)
+        strategic_move = "Maintain steady execution across weekly priorities."
+        if burnout_risk == "Critical Risk":
+            strategic_move = "Aggressively front-load exam prep and reduce parallel project load."
+        elif burnout_risk == "High Risk":
+            strategic_move = "Create workload buffers before the peak week and lock deep-work blocks."
+        elif upcoming_exam_weight >= 25:
+            strategic_move = "Reallocate study time toward high-weight exam preparation now."
 
-    risk_class = " risk-red" if burnout_risk in {"High Risk", "Critical Risk"} else ""
-    st.markdown(f'<div class="glass-card interactive-card intel-card{risk_class}">', unsafe_allow_html=True)
-    st.markdown('<div class="ai-badge">AI Workload Signal</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">AI Insight Panel</div>', unsafe_allow_html=True)
-    st.markdown(
-        (
-            f"**Risk posture:** {burnout_risk} across **{len(stress_score_by_week)} active weeks** "
-            f"with **{hot_weeks} high-pressure weeks** detected."
+        st.markdown('<div class="ai-badge">AI Workload Signal</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">AI Insight Panel</div>', unsafe_allow_html=True)
+        if burnout_risk in {"High Risk", "Critical Risk"}:
+            st.markdown('<div class="risk-signal-bar"></div>', unsafe_allow_html=True)
+        st.markdown(
+            (
+                f"**Risk posture:** {burnout_risk} across **{len(stress_score_by_week)} active weeks** "
+                f"with **{hot_weeks} high-pressure weeks** detected."
+            )
         )
-    )
-    st.markdown(
-        f"**Peak stress event:** {peak_week} at **{max_stress} stress points** across **{total_tasks} scheduled tasks**."
-    )
-    st.markdown(f"**Recommended AI move:** {strategic_move}")
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"**Peak stress event:** {peak_week} at **{max_stress} stress points** across **{total_tasks} scheduled tasks**."
+        )
+        st.markdown(f"**Recommended AI move:** {strategic_move}")
 
 
 def _render_raw_outputs(
@@ -1129,8 +1122,7 @@ def _render_raw_outputs(
     study_guide: Dict[str, Dict[str, object]],
 ) -> None:
     with st.expander("Detailed Weekly Plan", expanded=False):
-        for week in sorted(weekly_plan.keys(), key=_week_sort_key):
-            st.markdown(f"**{week}**")
+        for index, week in enumerate(sorted(weekly_plan.keys(), key=_week_sort_key)):
             rows = []
             for task in weekly_plan[week]:
                 rows.append(
@@ -1143,7 +1135,9 @@ def _render_raw_outputs(
                     }
                 )
             if rows:
-                st.table(rows)
+                with st.container(key=f"card_detail_week_{index}"):
+                    st.markdown(f"**{week}**")
+                    st.table(rows)
     with st.expander("Study Guide Detail", expanded=False):
         st.json(study_guide)
 
@@ -1157,7 +1151,7 @@ def main() -> None:
         <div class="hero-header">
             <div class="app-title">Syllabus-to-Action Dashboard</div>
             <div class="app-subtitle">
-                SaaS-style workload intelligence powered by deterministic planning and optional AI refinement.
+                Academic workload intelligence combining deterministic structure with AI-powered stress simulation.
             </div>
         </div>
         """,
