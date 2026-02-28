@@ -93,289 +93,6 @@ def _load_background_svg_base64() -> Tuple[str, str]:
 
 
 def _inject_styles() -> None:
-    st.markdown(
-        """
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-            .stApp {
-                background: transparent !important;
-                color: #E8EEFF;
-                font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-                font-weight: 300;
-            }
-            [data-testid="stHeader"] {
-                background: rgba(0, 0, 0, 0);
-            }
-            .block-container {
-                max-width: 1240px;
-                padding-top: 1.2rem;
-                padding-bottom: 1.75rem;
-            }
-            [data-testid="stHorizontalBlock"] {
-                gap: 1.2rem;
-                align-items: stretch;
-            }
-            .hero-header {
-                position: relative;
-                padding: 1.06rem 1.35rem 1.12rem;
-                margin-bottom: 0.95rem;
-            }
-            .hero-header::before {
-                content: "";
-                position: absolute;
-                inset: -26px -14px auto -14px;
-                height: 150px;
-                border-radius: 30px;
-                background: radial-gradient(ellipse at center, rgba(123, 171, 255, 0.38) 0%, rgba(123, 171, 255, 0.10) 52%, transparent 78%);
-                filter: blur(12px);
-                z-index: 0;
-                pointer-events: none;
-            }
-            .hero-header > * {
-                position: relative;
-                z-index: 1;
-            }
-            .divider-line {
-                height: 1px;
-                background: rgba(255,255,255,0.15);
-                margin: 32px 0;
-            }
-            .glass-card,
-            div[class*="st-key-card_"] {
-                background: rgba(8, 20, 58, 0.34);
-                border: 1px solid rgba(198, 220, 255, 0.16);
-                border-radius: 22px;
-                backdrop-filter: blur(8px);
-                -webkit-backdrop-filter: blur(8px);
-                box-shadow:
-                    0 14px 30px rgba(3, 10, 30, 0.28),
-                    0 0 18px rgba(86, 145, 255, 0.05),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-                    inset 0 -6px 12px rgba(3, 8, 24, 0.2);
-                padding: 1.25rem;
-                margin-bottom: 0.7rem;
-                transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-                overflow: hidden;
-            }
-            div[class*="st-key-card_"]:has(> div[data-testid="stPlotlyChart"]),
-            div[class*="st-key-card_"]:has(> div[data-testid="stTable"]),
-            div[class*="st-key-card_"]:has(> div[data-testid="stDataFrame"]) {
-                background: rgba(9, 18, 42, 0.38);
-                backdrop-filter: blur(5px);
-            }
-            div[class*="st-key-card_"]:hover {
-                transform: translateY(-4px);
-                border-color: rgba(182, 213, 255, 0.22);
-                box-shadow:
-                    0 24px 50px rgba(4, 11, 34, 0.56),
-                    0 0 36px rgba(105, 163, 255, 0.19),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.10),
-                    inset 0 -10px 18px rgba(2, 6, 20, 0.39);
-            }
-            div[class*="st-key-card_"][class*="risk-red"] {
-                border-color: rgba(255, 111, 111, 0.28);
-                box-shadow:
-                    0 24px 52px rgba(22, 5, 9, 0.5),
-                    0 0 54px rgba(239, 68, 68, 0.26),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                    inset 0 -14px 24px rgba(45, 5, 8, 0.4);
-            }
-            .intel-card,
-            div[class*="st-key-card_kpi_"] {
-                min-height: 146px;
-            }
-            div[class*="st-key-card_workload_chart"] {
-                display: flex;
-                flex-direction: column;
-            }
-            .workload-content {
-                flex-grow: 1;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-end;
-            }
-            div[class*="st-key-card_kpi_"] .stMarkdown {
-                margin: 0 !important;
-            }
-            div[class*="st-key-card_kpi_"] .stMarkdown p {
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            .dashboard-grid {
-                display: grid;
-                grid-template-columns: repeat(4, minmax(0, 1fr));
-                gap: 1.02rem;
-                margin-bottom: 0.2rem;
-            }
-            .ai-badge {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.36rem;
-                font-size: 10.5px;
-                letter-spacing: 1px;
-                text-transform: uppercase;
-                font-weight: 700;
-                line-height: 1.1;
-                color: #bfe9ff;
-                background: linear-gradient(135deg, rgba(0,120,255,0.25), rgba(80,0,255,0.25));
-                border: 1px solid rgba(0,180,255,0.4);
-                border-radius: 999px;
-                padding: 4px 10px;
-                backdrop-filter: blur(6px);
-                -webkit-backdrop-filter: blur(6px);
-                white-space: nowrap;
-                animation: aiBadgeFadeIn 0.4s ease both;
-                transition: box-shadow 0.2s ease;
-            }
-            .ai-badge::before {
-                content: "";
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                background: rgba(186, 232, 255, 0.92);
-                box-shadow:
-                    0 0 0 1px rgba(90, 188, 255, 0.55),
-                    0 0 6px rgba(0, 140, 255, 0.42);
-                flex-shrink: 0;
-            }
-            .ai-badge:hover {
-                box-shadow: 0 0 8px rgba(0,140,255,0.5);
-            }
-            .ai-section-header {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                flex-wrap: wrap;
-                margin-bottom: 0.5rem;
-            }
-            .ai-section-header .section-title {
-                margin-bottom: 0;
-            }
-            .ai-insight-chip {
-                display: inline-block;
-                font-size: 0.64rem;
-                letter-spacing: 0.08em;
-                text-transform: uppercase;
-                font-weight: 700;
-                color: #DDE9FF;
-                background: linear-gradient(135deg, rgba(118, 164, 255, 0.35), rgba(73, 115, 236, 0.2));
-                border: 1px solid rgba(187, 209, 255, 0.35);
-                border-radius: 999px;
-                padding: 0.22rem 0.55rem;
-                margin-bottom: 0.4rem;
-            }
-            .kpi-label {
-                color: #AFC5FF;
-                letter-spacing: 0.04em;
-                font-size: 0.76rem;
-                text-transform: uppercase;
-                margin-bottom: 4.8px;
-            }
-            .kpi-value {
-                color: #FFFFFF;
-                font-size: 1.86rem;
-                font-weight: 600;
-                line-height: 1.2;
-                margin-bottom: 3.2px;
-            }
-            .kpi-sub {
-                color: #CFE0FF;
-                font-size: 0.82rem;
-                margin-bottom: 0.25rem;
-            }
-            .kpi-ai {
-                color: #9EC3FF;
-                font-size: 0.8rem;
-                margin-top: 3.68px;
-                margin-bottom: 16px;
-                line-height: 1.4;
-            }
-            .chart-kicker {
-                font-size: 0.74rem;
-                color: #AFC8FF;
-                margin-bottom: 0.2rem;
-            }
-            .chart-caption {
-                font-size: 0.76rem;
-                color: #AFC8FF;
-                margin-top: -2.4px;
-                margin-bottom: 12.4px;
-            }
-            .risk-signal-bar {
-                height: 0.42rem;
-                border-radius: 999px;
-                background: linear-gradient(90deg, rgba(239,68,68,0.65), rgba(239,68,68,0.05));
-                margin-bottom: 0.55rem;
-            }
-            .section-title {
-                font-size: 1.08rem;
-                font-weight: 500;
-                color: #EAF1FF;
-                margin-bottom: 0.5rem;
-            }
-            .app-title {
-                font-size: 2.15rem;
-                color: #F5F8FF;
-                font-weight: 600;
-                margin-bottom: 0.22rem;
-                letter-spacing: -0.02em;
-            }
-            .app-subtitle {
-                color: #BFD2FF;
-                margin-bottom: 0;
-                font-size: 0.98rem;
-            }
-            .stApp p, .stApp li, .stApp label {
-                font-weight: 300;
-            }
-            .stTextArea textarea {
-                background: rgba(9, 20, 45, 0.75) !important;
-                color: #ECF2FF !important;
-                border: 1px solid rgba(173, 197, 255, 0.35) !important;
-            }
-            .stButton button {
-                border-radius: 14px;
-            }
-            .js-plotly-plot .slice path {
-                transform-origin: center center;
-                transition: transform 0.18s ease, filter 0.18s ease;
-            }
-            .js-plotly-plot .slice path:hover {
-                transform: scale(1.06);
-                filter: drop-shadow(0 0 10px rgba(129, 198, 255, 0.5));
-            }
-            .js-plotly-plot .hoverlayer .hovertext {
-                filter: drop-shadow(0 0 10px rgba(95, 155, 255, 0.22));
-            }
-            @keyframes peakPulse {
-                0% { transform: scale(1.0); filter: drop-shadow(0 0 3px rgba(166, 242, 255, 0.25)); }
-                50% { transform: scale(1.055); filter: drop-shadow(0 0 7px rgba(166, 242, 255, 0.38)); }
-                100% { transform: scale(1.0); filter: drop-shadow(0 0 3px rgba(166, 242, 255, 0.25)); }
-            }
-            @keyframes aiBadgeFadeIn {
-                from { opacity: 0; transform: translateY(2px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-            .js-plotly-plot .scatterlayer .trace:last-child path {
-                transform-box: fill-box;
-                transform-origin: center;
-                animation: peakPulse 3.8s ease-in-out infinite;
-            }
-            @media (max-width: 1100px) {
-                .dashboard-grid {
-                    grid-template-columns: repeat(2, minmax(0, 1fr));
-                }
-            }
-            @media (max-width: 700px) {
-                .dashboard-grid {
-                    grid-template-columns: 1fr;
-                }
-            }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
     light_bg_b64, dark_bg_b64 = _load_background_svg_base64()
     st.markdown(
         f"""
@@ -384,82 +101,608 @@ def _inject_styles() -> None:
                 --bg-img-light: url("data:image/svg+xml;base64,{light_bg_b64}");
                 --bg-img-dark: url("data:image/svg+xml;base64,{dark_bg_b64}");
                 --bg-img: var(--bg-img-dark);
+                --bg-overlay-1: rgba(18, 102, 255, 0.83);
+                --bg-overlay-2: rgba(2, 47, 168, 0.74);
+                --vignette: radial-gradient(ellipse 100% 42% at 50% 100%, rgba(0, 10, 40, 0.35) 0%, rgba(0, 0, 30, 0.22) 25%, rgba(0, 0, 0, 0.10) 40%, rgba(0, 0, 0, 0.00) 60%);
+                --font-family: "SF Pro Text", "SF Pro Display", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                --font-h1: 42px;
+                --font-section: 19px;
+                --font-card-title: 17px;
+                --font-caption: 12.5px;
+                --space-1: 0.375rem;
+                --space-2: 0.625rem;
+                --space-3: 1rem;
+                --space-4: 1.4rem;
+                --space-5: 1.8rem;
+                --radius-card: 18px;
+                --radius-pill: 999px;
+                --blur-card: 16px;
+                --card-padding: 20px;
+                --card-bg: rgba(10, 20, 45, 0.42);
+                --card-bg-strong: rgba(13, 27, 60, 0.48);
+                --card-bg-soft: rgba(8, 16, 38, 0.38);
+                --card-border: rgba(255, 255, 255, 0.10);
+                --card-shadow-1: 0 20px 50px rgba(0, 0, 0, 0.35);
+                --card-shadow-2: 0 4px 12px rgba(0, 0, 0, 0.25);
+                --text-primary: rgba(246, 250, 255, 0.98);
+                --text-secondary: rgba(209, 222, 246, 0.84);
+                --chip-bg: linear-gradient(135deg, rgba(0, 120, 255, 0.25), rgba(80, 0, 255, 0.25));
+                --chip-border: rgba(0, 180, 255, 0.4);
+                --chip-text: #bfe9ff;
+                --focus-ring: rgba(154, 202, 255, 0.68);
+            }}
+            html[data-theme="light"] {{
+                --bg-img: var(--bg-img-light);
+                --bg-overlay-1: rgba(110, 170, 255, 0.66);
+                --bg-overlay-2: rgba(56, 128, 232, 0.65);
+                --vignette: none;
+                --text-primary: rgba(248, 251, 255, 0.98);
+                --text-secondary: rgba(227, 236, 252, 0.84);
+                --focus-ring: rgba(132, 180, 242, 0.64);
+            }}
+            html[data-theme="dark"] {{
+                --bg-img: var(--bg-img-dark);
+                --bg-overlay-1: rgba(18, 102, 255, 0.83);
+                --bg-overlay-2: rgba(2, 47, 168, 0.74);
+                --vignette: radial-gradient(ellipse 100% 42% at 50% 100%, rgba(0, 10, 40, 0.35) 0%, rgba(0, 0, 30, 0.22) 25%, rgba(0, 0, 0, 0.10) 40%, rgba(0, 0, 0, 0.00) 60%);
+                --text-primary: rgba(246, 250, 255, 0.98);
+                --text-secondary: rgba(209, 222, 246, 0.84);
+                --focus-ring: rgba(154, 202, 255, 0.68);
             }}
             html:not([data-theme]) {{
                 --bg-img: var(--bg-img-dark);
             }}
-            html[data-theme="light"] {{
-                --bg-img: var(--bg-img-light);
+            @media (prefers-color-scheme: light) {{
+                html:not([data-theme]) {{
+                    --bg-img: var(--bg-img-light);
+                    --bg-overlay-1: rgba(110, 170, 255, 0.66);
+                    --bg-overlay-2: rgba(56, 128, 232, 0.65);
+                    --vignette: none;
+                    --text-primary: rgba(248, 251, 255, 0.98);
+                    --text-secondary: rgba(227, 236, 252, 0.84);
+                    --focus-ring: rgba(132, 180, 242, 0.64);
+                }}
             }}
-            html[data-theme="dark"] {{
-                --bg-img: var(--bg-img-dark);
+            @media (prefers-color-scheme: dark) {{
+                html:not([data-theme]) {{
+                    --bg-img: var(--bg-img-dark);
+                    --bg-overlay-1: rgba(18, 102, 255, 0.83);
+                    --bg-overlay-2: rgba(2, 47, 168, 0.74);
+                    --vignette: radial-gradient(ellipse 100% 42% at 50% 100%, rgba(0, 10, 40, 0.35) 0%, rgba(0, 0, 30, 0.22) 25%, rgba(0, 0, 0, 0.10) 40%, rgba(0, 0, 0, 0.00) 60%);
+                    --text-primary: rgba(246, 250, 255, 0.98);
+                    --text-secondary: rgba(209, 222, 246, 0.84);
+                    --focus-ring: rgba(154, 202, 255, 0.68);
+                }}
             }}
             html, body {{
                 background: transparent !important;
+                color: var(--text-primary);
             }}
-            [data-testid="stAppViewContainer"] {{
-                position: relative;
-                z-index: 0;
-                background: transparent !important;
+            body {{
+                font-family: var(--font-family);
             }}
             body::before {{
                 content: "";
                 position: fixed;
                 inset: 0;
-                z-index: -2;
+                z-index: -3;
                 pointer-events: none;
                 background-image: var(--bg-img);
                 background-size: cover;
-                background-position: center center;
+                background-position: center;
                 background-repeat: no-repeat;
-                filter: brightness(0.90) contrast(1.03);
+                background-attachment: fixed;
+                filter: saturate(110%) contrast(105%);
             }}
-            body::after {{
+            [data-testid="stAppViewContainer"] {{
+                position: relative;
+                z-index: 1;
+                isolation: isolate;
+                min-height: 100vh;
+                background: transparent !important;
+            }}
+            [data-testid="stAppViewContainer"]::before {{
                 content: "";
                 position: fixed;
                 inset: 0;
-                z-index: -1;
+                z-index: 0;
                 pointer-events: none;
-                background: transparent;
+                background: linear-gradient(115deg, var(--bg-overlay-1) 0%, var(--bg-overlay-2) 62%, rgba(0, 76, 214, 0.65) 100%);
+            }}
+            [data-testid="stAppViewContainer"]::after {{
+                content: "";
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                height: 44vh;
+                z-index: 1;
+                pointer-events: none;
+                background: var(--vignette);
+                background-repeat: no-repeat;
+                background-position: center bottom;
+                background-size: 100% 44vh;
+            }}
+            [data-testid="stAppViewContainer"] > .main,
+            [data-testid="stHeader"],
+            [data-testid="stSidebar"] {{
+                position: relative;
+                z-index: 2;
+            }}
+            .stApp {{
+                background: transparent !important;
+                color: var(--text-primary);
+                font-family: var(--font-family);
+                font-weight: 400;
+            }}
+            .stApp p,
+            .stApp li,
+            .stApp label {{
+                color: var(--text-secondary);
+            }}
+            [data-testid="stHeader"] {{
+                background: rgba(0, 0, 0, 0);
+            }}
+            .block-container {{
+                max-width: 1240px;
+                padding-top: 1.25rem;
+                padding-bottom: 2.1rem;
+                gap: var(--space-5);
+            }}
+            [data-testid="stHorizontalBlock"] {{
+                gap: var(--space-5);
+                align-items: stretch;
+            }}
+            div[class*="st-key-kpi_row"] [data-testid="stHorizontalBlock"] {{
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                gap: 18px;
+                align-items: stretch;
+                width: 100%;
+            }}
+            div[class*="st-key-kpi_row"] [data-testid="stHorizontalBlock"] > [data-testid="column"] {{
+                min-width: 0 !important;
+                width: auto !important;
+                flex: 1 1 0 !important;
+            }}
+            div[class*="st-key-kpi_row"] [data-testid="stHorizontalBlock"] > [data-testid="column"] > div {{
+                width: 100%;
+                min-width: 0;
+                height: 100%;
+            }}
+            .hero-header {{
+                position: relative;
+                padding: 1.2rem 1.35rem 1.28rem;
+                margin-bottom: 1.45rem;
+            }}
+            .hero-header::before {{
+                content: "";
+                position: absolute;
+                inset: -24px -10px auto -10px;
+                height: 176px;
+                border-radius: 34px;
+                background: radial-gradient(ellipse at center, rgba(126, 188, 255, 0.30) 0%, rgba(109, 157, 255, 0.08) 56%, transparent 80%);
+                filter: blur(14px);
+                z-index: 0;
+                pointer-events: none;
+            }}
+            .hero-header > * {{
+                position: relative;
+                z-index: 1;
+            }}
+            .glass-card,
+            div[class*="st-key-card_"],
+            [data-testid="stExpander"] {{
+                background: var(--card-bg);
+                border: 1px solid var(--card-border);
+                border-radius: var(--radius-card);
+                backdrop-filter: blur(16px) saturate(160%);
+                -webkit-backdrop-filter: blur(16px) saturate(160%);
+                box-shadow:
+                    var(--card-shadow-1),
+                    var(--card-shadow-2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                    0 0 80px rgba(0, 120, 255, 0.08);
+                padding: var(--card-padding);
+                margin-bottom: 1.15rem;
+                transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+                overflow: hidden;
+                transform: translateZ(0);
+                will-change: transform;
+            }}
+            div[class*="st-key-card_workload_chart"],
+            div[class*="st-key-card_grading_chart"],
+            div[class*="st-key-card_ai_insight"],
+            div[class*="st-key-card_ai_strategy"] {{
+                background: var(--card-bg-strong);
+            }}
+            div[class*="st-key-card_ai_intelligence"],
+            div[class*="st-key-card_detail_week_"],
+            [data-testid="stExpander"] {{
+                background: var(--card-bg-soft);
+            }}
+            div[class*="st-key-card_"]:hover,
+            div[class*="st-key-card_"]:focus-within,
+            [data-testid="stExpander"]:hover,
+            [data-testid="stExpander"]:focus-within {{
+                transform: translateY(-2px);
+                border-color: rgba(255, 255, 255, 0.16);
+                box-shadow:
+                    0 24px 58px rgba(0, 0, 0, 0.40),
+                    0 8px 16px rgba(0, 0, 0, 0.28),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                    0 0 96px rgba(0, 140, 255, 0.10);
+            }}
+            div[class*="st-key-card_"][class*="risk-red"] {{
+                border-color: rgba(255, 127, 127, 0.34);
+                box-shadow:
+                    0 22px 56px rgba(25, 8, 10, 0.42),
+                    0 8px 16px rgba(20, 8, 10, 0.28),
+                    inset 0 1px 0 rgba(255, 224, 224, 0.12),
+                    0 0 86px rgba(255, 88, 88, 0.09);
+            }}
+            div[class*="st-key-card_kpi_"] {{
+                min-height: 146px;
+                height: 100%;
+                width: 100%;
+                min-width: 0;
+                display: block;
+                grid-column: auto !important;
+                grid-row: auto !important;
+                writing-mode: horizontal-tb !important;
+                white-space: normal !important;
+                word-break: normal !important;
+                overflow-wrap: break-word !important;
+                padding: 1.25rem;
+            }}
+            div[class*="st-key-card_kpi_"][class*="risk-red"] {{
+                position: relative;
+                border: 1px solid rgba(255, 80, 80, 0.5);
+                box-shadow:
+                    0 0 25px rgba(255, 50, 80, 0.25),
+                    0 20px 50px rgba(0, 0, 0, 0.35),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+            }}
+            div[class*="st-key-card_kpi_"][class*="risk-red"]::after {{
+                content: "";
+                position: absolute;
+                left: 16px;
+                right: 16px;
+                bottom: 8px;
+                height: 2px;
+                border-radius: 999px;
+                background: linear-gradient(90deg, rgba(255, 95, 95, 0), rgba(255, 95, 95, 0.38), rgba(255, 95, 95, 0));
+                pointer-events: none;
+            }}
+            div[class*="st-key-card_workload_chart"] {{
+                display: flex;
+                flex-direction: column;
+            }}
+            .workload-content {{
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+            }}
+            div[class*="st-key-card_kpi_"] .stMarkdown {{
+                margin: 0 0 0.34rem 0 !important;
+                white-space: normal !important;
+                word-break: normal !important;
+                overflow-wrap: break-word !important;
+            }}
+            div[class*="st-key-card_kpi_"] .stMarkdown:last-child {{
+                margin-bottom: 0 !important;
+            }}
+            div[class*="st-key-card_kpi_"] .stMarkdown p {{
+                margin: 0 !important;
+                padding: 0 !important;
+                white-space: normal !important;
+                word-break: normal !important;
+                overflow-wrap: break-word !important;
+            }}
+            .ai-section-header {{
+                display: flex;
+                align-items: center;
+                gap: var(--space-2);
+                flex-wrap: wrap;
+                margin-bottom: 0.7rem;
+            }}
+            .ai-section-header .section-title {{
+                margin-bottom: 0;
+            }}
+            .ai-badge {{
+                display: inline-flex;
+                align-items: center;
+                gap: 0.36rem;
+                font-size: 10px;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                font-weight: 700;
+                line-height: 1.1;
+                color: #bfe9ff;
+                background: linear-gradient(135deg, rgba(0, 120, 255, 0.25), rgba(80, 0, 255, 0.25));
+                border: 1px solid rgba(0, 180, 255, 0.4);
+                border-radius: 999px;
+                padding: 4px 10px;
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
+                white-space: nowrap;
+                animation: aiBadgeFadeIn 0.28s ease both;
+            }}
+            .ai-badge::before {{
+                content: "";
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: rgba(224, 242, 255, 0.95);
+                box-shadow: 0 0 0 1px rgba(127, 178, 255, 0.58), 0 0 8px rgba(122, 185, 255, 0.34);
+                flex-shrink: 0;
+            }}
+            .ai-insight-chip {{
+                display: inline-block;
+                border-radius: 999px;
+                border: 1px solid rgba(170, 210, 255, 0.36);
+                background: rgba(28, 66, 156, 0.28);
+                color: rgba(225, 242, 255, 0.95);
+                font-size: 10px;
+                letter-spacing: 0.9px;
+                text-transform: uppercase;
+                font-weight: 700;
+                padding: 0.22rem 0.55rem;
+                margin-bottom: 0.4rem;
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
+            }}
+            .kpi-label {{
+                color: var(--text-secondary);
+                letter-spacing: 0.04em;
+                font-size: 0.76rem;
+                text-transform: uppercase;
+                margin-bottom: 4.8px;
+                font-weight: 500;
+            }}
+            .kpi-value {{
+                color: var(--text-primary);
+                font-size: 1.86rem;
+                font-weight: 600;
+                line-height: 1.2;
+                margin-bottom: 3.2px;
+                text-shadow: 0 0 18px rgba(0, 140, 255, 0.35);
+            }}
+            .kpi-sub {{
+                color: var(--text-secondary);
+                font-size: 0.82rem;
+                margin-bottom: 0.25rem;
+                opacity: 0.9;
+            }}
+            .kpi-ai {{
+                color: var(--text-secondary);
+                font-size: 0.8rem;
+                margin-top: 3.68px;
+                margin-bottom: 16px;
+                line-height: 1.4;
+                opacity: 0.92;
+            }}
+            .kpi-stack {{
+                display: flow-root;
+            }}
+            .kpi-stack > * {{
+                margin-top: 0;
+                margin-bottom: 0;
+            }}
+            .kpi-stack > .ai-insight-chip {{
+                margin-bottom: 0.4rem;
+            }}
+            .kpi-stack > .kpi-label {{
+                margin-bottom: 4.8px;
+            }}
+            .kpi-stack > .kpi-value {{
+                margin-bottom: 3.2px;
+            }}
+            .kpi-stack > .kpi-sub {{
+                margin-bottom: 0.25rem;
+            }}
+            .kpi-stack > .kpi-ai {{
+                margin-top: 3.68px;
+                margin-bottom: 14px;
+            }}
+            .chart-kicker,
+            .chart-caption,
+            .stCaptionContainer p {{
+                font-size: var(--font-caption);
+                color: var(--text-secondary) !important;
+                opacity: 0.76;
+            }}
+            .chart-kicker {{
+                margin-bottom: 0.25rem;
+            }}
+            .chart-caption {{
+                margin-top: 0.1rem;
+                margin-bottom: 0.2rem;
+            }}
+            .risk-signal-bar {{
+                height: 0.42rem;
+                border-radius: var(--radius-pill);
+                background: linear-gradient(90deg, rgba(239, 68, 68, 0.65), rgba(239, 68, 68, 0.07));
+                margin-bottom: 0.7rem;
+            }}
+            .section-title {{
+                font-size: var(--font-section);
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: 0.62rem;
+                letter-spacing: -0.01em;
+                line-height: 1.2;
+            }}
+            div[class*="st-key-card_"] h3,
+            div[class*="st-key-card_"] h4 {{
+                font-size: var(--font-card-title);
+                font-weight: 600;
+                color: var(--text-primary);
+                letter-spacing: -0.01em;
+            }}
+            .app-title {{
+                font-size: 42px;
+                color: var(--text-primary);
+                font-weight: 700;
+                line-height: 1.06;
+                margin-bottom: 0.28rem;
+                letter-spacing: -0.5px;
+            }}
+            .app-subtitle {{
+                color: var(--text-secondary);
+                margin-bottom: 0;
+                font-size: 1rem;
+                opacity: 0.86;
+            }}
+            .stTextArea textarea,
+            .stTextInput input,
+            .stNumberInput input,
+            div[data-baseweb="select"] > div,
+            div[data-baseweb="slider"] {{
+                background: rgba(12, 24, 52, 0.42) !important;
+                color: var(--text-primary) !important;
+                border: 1px solid var(--card-border) !important;
+                border-radius: 14px !important;
+                backdrop-filter: blur(12px) saturate(150%);
+                -webkit-backdrop-filter: blur(12px) saturate(150%);
+            }}
+            .stButton button {{
+                border-radius: 14px;
+                border: 1px solid var(--card-border);
+                background: rgba(255, 255, 255, 0.09);
+                color: var(--text-primary);
+                transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            }}
+            .stButton button:hover {{
+                transform: translateY(-1px);
+                border-color: rgba(219, 236, 255, 0.3);
+                box-shadow: 0 12px 22px rgba(4, 16, 45, 0.24);
+            }}
+            :where(button, input, textarea, select, [role="slider"]):focus-visible,
+            [data-baseweb="slider"] [role="slider"]:focus-visible {{
+                outline: none !important;
+                box-shadow: 0 0 0 3px var(--focus-ring) !important;
+                border-color: rgba(191, 221, 255, 0.7) !important;
+            }}
+            div[data-testid="stTable"] table tbody tr:hover td,
+            div[data-testid="stDataFrame"] [role="row"]:hover {{
+                background: rgba(255, 255, 255, 0.05) !important;
             }}
             #icloud-theme-toggle {{
                 position: fixed;
-                top: 0.62rem;
-                right: 0.82rem;
+                top: 0.68rem;
+                right: 0.86rem;
                 z-index: 1000;
                 display: inline-flex;
-                gap: 0.3rem;
-                padding: 0.24rem;
-                border-radius: 999px;
-                background: rgba(8, 16, 38, 0.46);
-                border: 1px solid rgba(183, 205, 255, 0.24);
-                backdrop-filter: blur(8px);
-                -webkit-backdrop-filter: blur(8px);
+                gap: 0.34rem;
+                padding: 0.26rem;
+                border-radius: var(--radius-pill);
+                background: rgba(10, 20, 45, 0.42);
+                border: 1px solid rgba(255, 255, 255, 0.10);
+                box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+                backdrop-filter: blur(14px) saturate(155%);
+                -webkit-backdrop-filter: blur(14px) saturate(155%);
             }}
             #icloud-theme-toggle .theme-btn {{
                 border: 0;
-                border-radius: 999px;
-                font-size: 0.68rem;
+                border-radius: var(--radius-pill);
+                font-size: 11px;
                 line-height: 1;
-                padding: 0.34rem 0.6rem;
-                color: #EAF2FF;
-                background: rgba(35, 62, 129, 0.35);
+                padding: 0.37rem 0.64rem;
+                color: var(--text-secondary);
+                background: transparent;
                 cursor: pointer;
+                transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+            }}
+            #icloud-theme-toggle .theme-btn:hover {{
+                background: rgba(157, 193, 255, 0.18);
+                color: var(--text-primary);
             }}
             #icloud-theme-toggle .theme-btn.active {{
-                background: rgba(108, 150, 255, 0.52);
-                color: #FFFFFF;
+                background: rgba(132, 174, 255, 0.36);
+                color: var(--text-primary);
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
             }}
-            @media (max-width: 700px) {{
+            .js-plotly-plot .slice path {{
+                transform-origin: center center;
+                transition: transform 0.18s ease, filter 0.18s ease;
+            }}
+            .js-plotly-plot .slice path:hover {{
+                transform: scale(1.06);
+                filter: drop-shadow(0 0 10px rgba(129, 198, 255, 0.5));
+            }}
+            .js-plotly-plot .hoverlayer .hovertext {{
+                filter: drop-shadow(0 0 10px rgba(95, 155, 255, 0.22));
+            }}
+            @keyframes peakPulse {{
+                0% {{ transform: scale(1.0); filter: drop-shadow(0 0 3px rgba(166, 242, 255, 0.25)); }}
+                50% {{ transform: scale(1.055); filter: drop-shadow(0 0 7px rgba(166, 242, 255, 0.38)); }}
+                100% {{ transform: scale(1.0); filter: drop-shadow(0 0 3px rgba(166, 242, 255, 0.25)); }}
+            }}
+            @keyframes aiBadgeFadeIn {{
+                from {{ opacity: 0; transform: translateY(2px); }}
+                to {{ opacity: 1; transform: translateY(0); }}
+            }}
+            .js-plotly-plot .scatterlayer .trace:last-child path {{
+                transform-box: fill-box;
+                transform-origin: center;
+                animation: peakPulse 3.8s ease-in-out infinite;
+            }}
+            @media (max-width: 1100px) {{
+                div[class*="st-key-kpi_row"] [data-testid="stHorizontalBlock"] {{
+                    flex-wrap: wrap !important;
+                }}
+                div[class*="st-key-kpi_row"] [data-testid="stHorizontalBlock"] > [data-testid="column"] {{
+                    flex: 0 0 calc((100% - 18px) / 2) !important;
+                    width: calc((100% - 18px) / 2) !important;
+                }}
+            }}
+            @media (max-width: 980px) {{
+                .block-container {{
+                    padding-left: 0.95rem;
+                    padding-right: 0.95rem;
+                    padding-bottom: 1.4rem;
+                    gap: 1rem;
+                }}
+                [data-testid="stHorizontalBlock"] {{
+                    flex-direction: column;
+                    gap: 1rem;
+                }}
+                [data-testid="column"] {{
+                    width: 100% !important;
+                    flex: 1 1 100% !important;
+                }}
+                div[class*="st-key-card_"],
+                [data-testid="stExpander"] {{
+                    border-radius: 16px;
+                    padding: 16px;
+                }}
+                [data-testid="stAppViewContainer"]::after {{
+                    height: 36vh;
+                    background-size: 100% 36vh;
+                }}
+                .app-title {{
+                    font-size: 34px;
+                }}
                 #icloud-theme-toggle {{
-                    top: 0.55rem;
-                    right: 0.55rem;
+                    top: 0.58rem;
+                    right: 0.58rem;
                     gap: 0.2rem;
-                    padding: 0.2rem;
+                    padding: 0.22rem;
                 }}
                 #icloud-theme-toggle .theme-btn {{
-                    font-size: 0.62rem;
-                    padding: 0.3rem 0.52rem;
+                    font-size: 10px;
+                    padding: 0.32rem 0.5rem;
+                }}
+            }}
+            @media (max-width: 640px) {{
+                div[class*="st-key-kpi_row"] [data-testid="stHorizontalBlock"] {{
+                    flex-wrap: wrap !important;
+                }}
+                div[class*="st-key-kpi_row"] [data-testid="stHorizontalBlock"] > [data-testid="column"] {{
+                    flex: 0 0 100% !important;
+                    width: 100% !important;
                 }}
             }}
         </style>
@@ -851,16 +1094,24 @@ def _render_kpis(
         ("AI Exam Pressure", f"{upcoming_exam_weight:.0f}%", "Nearest upcoming exam", exam_ai, False),
         ("AI Burnout Risk", burnout_risk, f"{len(weekly_plan)} weeks scheduled", burnout_ai, burnout_risk in {"High Risk", "Critical Risk"}),
     ]
-    cols = st.columns(4)
-    for idx, (label, value, sub, ai_text, is_risk) in enumerate(kpi_data):
-        card_key = f"card_kpi_{idx}_risk-red" if is_risk else f"card_kpi_{idx}"
-        with cols[idx]:
-            with st.container(key=card_key):
-                st.markdown('<span class="ai-insight-chip">AI Insight</span>', unsafe_allow_html=True)
-                st.markdown(f'<div class="kpi-label">{label}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="kpi-value">{value}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="kpi-sub">{sub}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="kpi-ai">{ai_text}</div>', unsafe_allow_html=True)
+    with st.container(key="kpi_row"):
+        cols = st.columns(4)
+        for idx, (label, value, sub, ai_text, is_risk) in enumerate(kpi_data):
+            card_key = f"card_kpi_{idx}_risk-red" if is_risk else f"card_kpi_{idx}"
+            with cols[idx]:
+                with st.container(key=card_key):
+                    st.markdown(
+                        (
+                            '<div class="kpi-stack">'
+                            '<span class="ai-insight-chip">AI Insight</span>'
+                            f'<div class="kpi-label">{label}</div>'
+                            f'<div class="kpi-value">{value}</div>'
+                            f'<div class="kpi-sub">{sub}</div>'
+                            f'<div class="kpi-ai">{ai_text}</div>'
+                            "</div>"
+                        ),
+                        unsafe_allow_html=True,
+                    )
 
 
 def render_workload_chart(
@@ -868,7 +1119,15 @@ def render_workload_chart(
     risk_by_week: Dict[str, str],
 ) -> None:
     with st.container(key="card_workload_chart"):
-        st.markdown('<div class="section-title">Weekly Workload</div>', unsafe_allow_html=True)
+        st.markdown(
+            (
+                '<div class="ai-section-header">'
+                '<span class="ai-badge">AI GENERATED</span>'
+                '<div class="section-title">Weekly Workload</div>'
+                "</div>"
+            ),
+            unsafe_allow_html=True,
+        )
         if not stress_score_by_week:
             st.info("No weekly stress data available yet.")
             return
@@ -1165,7 +1424,15 @@ def render_workload_chart(
 
 def render_grading_chart(study_guide: Dict[str, Dict[str, object]]) -> None:
     with st.container(key="card_grading_chart"):
-        st.markdown('<div class="section-title">Grading Distribution by Course</div>', unsafe_allow_html=True)
+        st.markdown(
+            (
+                '<div class="ai-section-header">'
+                '<span class="ai-badge">AI GENERATED</span>'
+                '<div class="section-title">Grading Distribution by Course</div>'
+                "</div>"
+            ),
+            unsafe_allow_html=True,
+        )
         course_distributions: Dict[str, Dict[str, float]] = {}
         for course_name, info in study_guide.items():
             grading_breakdown = info.get("grading_breakdown", {})
