@@ -130,6 +130,12 @@ def _inject_styles() -> None:
                 --chip-border: rgba(0, 180, 255, 0.4);
                 --chip-text: #bfe9ff;
                 --focus-ring: rgba(154, 202, 255, 0.68);
+                --sidebar-text-primary: rgba(238, 246, 255, 0.96);
+                --sidebar-text-secondary: rgba(214, 226, 246, 0.90);
+                --sidebar-input-bg: rgba(12, 24, 52, 0.42);
+                --sidebar-input-border: var(--card-border);
+                --sidebar-button-bg: rgba(255, 255, 255, 0.09);
+                --sidebar-button-text: var(--sidebar-text-primary);
             }}
             html[data-theme="light"] {{
                 --bg-img: var(--bg-img-light);
@@ -139,6 +145,12 @@ def _inject_styles() -> None:
                 --text-primary: rgba(248, 251, 255, 0.98);
                 --text-secondary: rgba(227, 236, 252, 0.84);
                 --focus-ring: rgba(132, 180, 242, 0.64);
+                --sidebar-text-primary: rgba(28, 40, 62, 0.95);
+                --sidebar-text-secondary: rgba(67, 84, 112, 0.88);
+                --sidebar-input-bg: rgba(255, 255, 255, 0.72);
+                --sidebar-input-border: rgba(106, 128, 164, 0.45);
+                --sidebar-button-bg: rgba(255, 255, 255, 0.82);
+                --sidebar-button-text: rgba(23, 36, 60, 0.94);
             }}
             html[data-theme="dark"] {{
                 --bg-img: var(--bg-img-dark);
@@ -161,6 +173,12 @@ def _inject_styles() -> None:
                     --text-primary: rgba(248, 251, 255, 0.98);
                     --text-secondary: rgba(227, 236, 252, 0.84);
                     --focus-ring: rgba(132, 180, 242, 0.64);
+                    --sidebar-text-primary: rgba(28, 40, 62, 0.95);
+                    --sidebar-text-secondary: rgba(67, 84, 112, 0.88);
+                    --sidebar-input-bg: rgba(255, 255, 255, 0.72);
+                    --sidebar-input-border: rgba(106, 128, 164, 0.45);
+                    --sidebar-button-bg: rgba(255, 255, 255, 0.82);
+                    --sidebar-button-text: rgba(23, 36, 60, 0.94);
                 }}
             }}
             @media (prefers-color-scheme: dark) {{
@@ -239,6 +257,24 @@ def _inject_styles() -> None:
             .stApp li,
             .stApp label {{
                 color: var(--text-secondary);
+            }}
+            [data-testid="stSidebar"] {{
+                color: var(--sidebar-text-primary);
+            }}
+            [data-testid="stSidebar"] p,
+            [data-testid="stSidebar"] li,
+            [data-testid="stSidebar"] label,
+            [data-testid="stSidebar"] .stMarkdown,
+            [data-testid="stSidebar"] .stMarkdown p,
+            [data-testid="stSidebar"] [data-testid="stWidgetLabel"] {{
+                color: var(--sidebar-text-secondary) !important;
+            }}
+            [data-testid="stSidebar"] h1,
+            [data-testid="stSidebar"] h2,
+            [data-testid="stSidebar"] h3,
+            [data-testid="stSidebar"] h4,
+            [data-testid="stSidebar"] strong {{
+                color: var(--sidebar-text-primary) !important;
             }}
             [data-testid="stHeader"] {{
                 background: rgba(0, 0, 0, 0);
@@ -567,12 +603,31 @@ def _inject_styles() -> None:
                 backdrop-filter: blur(12px) saturate(150%);
                 -webkit-backdrop-filter: blur(12px) saturate(150%);
             }}
+            [data-testid="stSidebar"] .stTextArea textarea,
+            [data-testid="stSidebar"] .stTextInput input,
+            [data-testid="stSidebar"] .stNumberInput input,
+            [data-testid="stSidebar"] div[data-baseweb="select"] > div,
+            [data-testid="stSidebar"] div[data-baseweb="slider"] {{
+                background: var(--sidebar-input-bg) !important;
+                color: var(--sidebar-text-primary) !important;
+                border-color: var(--sidebar-input-border) !important;
+            }}
+            [data-testid="stSidebar"] .stTextArea textarea::placeholder,
+            [data-testid="stSidebar"] .stTextInput input::placeholder {{
+                color: var(--sidebar-text-secondary) !important;
+                opacity: 0.84;
+            }}
             .stButton button {{
                 border-radius: 14px;
                 border: 1px solid var(--card-border);
                 background: rgba(255, 255, 255, 0.09);
                 color: var(--text-primary);
                 transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            }}
+            [data-testid="stSidebar"] .stButton button {{
+                background: var(--sidebar-button-bg);
+                color: var(--sidebar-button-text);
+                border-color: var(--sidebar-input-border);
             }}
             .stButton button:hover {{
                 transform: translateY(-1px);
