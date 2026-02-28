@@ -542,6 +542,7 @@ def _set_sample_syllabi() -> None:
 
 
 def _render_input_panel() -> Tuple[List[str], bool, bool]:
+    syllabus_inputs: List[str] = []
     with st.sidebar:
         st.markdown("### Input")
         st.button("Load Sample Syllabi", on_click=_set_sample_syllabi, width="stretch")
@@ -553,19 +554,18 @@ def _render_input_panel() -> Tuple[List[str], bool, bool]:
             step=1,
             key="course_count",
         )
+        for index in range(int(course_count)):
+            syllabus_inputs.append(
+                st.text_area(
+                    f"Course {index + 1} syllabus",
+                    placeholder="Paste syllabus here...",
+                    key=f"syllabus_{index}",
+                    height=160,
+                )
+            )
         use_ai = st.checkbox("Use IBM AI for refinement", value=False)
         generate_clicked = st.button("Generate Dashboard", width="stretch")
 
-    syllabus_inputs: List[str] = []
-    for index in range(int(course_count)):
-        syllabus_inputs.append(
-            st.text_area(
-                f"Course {index + 1} syllabus",
-                placeholder="Paste syllabus here...",
-                key=f"syllabus_{index}",
-                height=160,
-            )
-        )
     return syllabus_inputs, use_ai, generate_clicked
 
 
@@ -1332,7 +1332,7 @@ def main() -> None:
     syllabus_inputs, use_ai, generate_clicked = _render_input_panel()
 
     if not generate_clicked:
-        st.info("Paste syllabus text and click Generate Dashboard.")
+        st.info("Paste syllabus text in the sidebar and click Generate Dashboard.")
         return
 
     ai_engine.USE_REAL_AI = use_ai
