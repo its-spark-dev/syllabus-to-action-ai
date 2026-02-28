@@ -1,6 +1,25 @@
 # Changelog
 
 ## [Unreleased]
+- Enhanced AI result card polish below top insight KPIs in `dashboard_app.py` with a reusable `.ai-badge` system (`AI GENERATED`) applied consistently to:
+  - Peak Breakdown
+  - What-if Results
+  - AI Workload Signal
+  - AI Intelligence Explanation
+  - AI Strategy
+  - Detailed Weekly Plan
+  - Study Guide Detail
+  Includes inline badge-title header composition, dark-theme-compatible glass gradient styling, 0.4s fade-in animation, and hover glow; preserved existing top insight chip visuals via separate `.ai-insight-chip`.
+- Added iCloud-style wallpaper assets in `assets/` and switched dashboard background rendering to use embedded base64 SVG wallpapers (`wallpaper.svg`, `wallpaper_dark.svg`) instead of prior synthetic gradient stacks.
+- Added client-side theme mode control (System/Light/Dark) with persisted preference and dynamic background asset switching in `dashboard_app.py`.
+- Tuned dark wallpaper rendering toward iCloud parity by adjusting SVG gradient stops/highlights and simplifying blend behavior; finalized app-level global tone with `brightness(0.90)` + `contrast(1.03)`.
+- Moved syllabus input text areas (`Course N syllabus`) from the main content area into the sidebar `Input` section and updated the empty-state guidance message accordingly.
+- Refactored dashboard card rendering in `dashboard_app.py` to use keyed Streamlit containers (`st.container(key=...)`) instead of HTML open/close wrappers, fixing cases where Plotly/table blocks rendered outside card boundaries.
+- Added container-key-scoped glass card styling for dashboard sections (charts, What-if, AI panels, detailed tables), including scoped `risk-red` variants for risk-focused cards.
+- Added KPI-card-only markdown reset to neutralize Streamlit default `<p>` margins:
+  - `div[class*="st-key-card_kpi_"] .stMarkdown { margin: 0 !important; }`
+  - `div[class*="st-key-card_kpi_"] .stMarkdown p { margin: 0 !important; padding: 0 !important; }`
+- Replaced inline chart/panel spacing styles with reusable CSS classes (`.chart-kicker`, `.chart-caption`, `.risk-signal-bar`) and tuned KPI typography rhythm (`.ai-badge`, `.kpi-*`) for stable vertical spacing.
 - Added deterministic `compute_ai_intelligence()` layer and appended `ai_intelligence` to AI outputs without changing deterministic scheduling logic.
 - Added AI intelligence outputs:
   - `stress_score`, `acceleration_index`, `burnout_probability`
