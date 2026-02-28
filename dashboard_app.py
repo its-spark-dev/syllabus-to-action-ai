@@ -476,10 +476,13 @@ def _inject_styles() -> None:
                 animation: aiLiveDot 1s ease-in-out infinite;
             }}
             .ai-insight-chip {{
+                position: relative;
                 display: inline-block;
                 border-radius: 999px;
                 border: 1px solid rgba(170, 210, 255, 0.36);
-                background: rgba(28, 66, 156, 0.28);
+                background:
+                    radial-gradient(circle at 50% 42%, rgba(193, 236, 255, 0.16), transparent 56%),
+                    linear-gradient(135deg, rgba(19, 66, 168, 0.54), rgba(56, 94, 188, 0.34));
                 color: rgba(225, 242, 255, 0.95);
                 font-size: 10px;
                 letter-spacing: 0.9px;
@@ -489,6 +492,28 @@ def _inject_styles() -> None:
                 margin-bottom: 0.4rem;
                 backdrop-filter: blur(6px);
                 -webkit-backdrop-filter: blur(6px);
+                overflow: hidden;
+                box-shadow:
+                    inset 0 1px 0 rgba(218, 240, 255, 0.22),
+                    0 0 14px rgba(78, 150, 255, 0.22);
+                animation: aiInsightAura 3.2s ease-in-out infinite;
+            }}
+            .ai-insight-chip::before {{
+                content: "";
+                position: absolute;
+                inset: -36%;
+                background:
+                    linear-gradient(
+                        120deg,
+                        rgba(255, 255, 255, 0) 26%,
+                        rgba(197, 244, 255, 0.16) 47%,
+                        rgba(255, 255, 255, 0.44) 50%,
+                        rgba(183, 242, 255, 0.14) 54%,
+                        rgba(255, 255, 255, 0) 72%
+                    );
+                transform: translateX(-132%) rotate(8deg);
+                animation: aiInsightSweep 3.9s cubic-bezier(0.2, 0.72, 0.2, 1) infinite;
+                pointer-events: none;
             }}
             .kpi-label {{
                 color: var(--text-secondary);
@@ -712,10 +737,38 @@ def _inject_styles() -> None:
                     box-shadow: 0 0 0 1px rgba(255, 144, 144, 0.5), 0 0 11px rgba(255, 74, 74, 0.58);
                 }}
             }}
+            @keyframes aiInsightAura {{
+                0%, 100% {{
+                    border-color: rgba(170, 210, 255, 0.36);
+                    box-shadow:
+                        inset 0 1px 0 rgba(218, 240, 255, 0.18),
+                        0 0 10px rgba(78, 150, 255, 0.18);
+                    filter: saturate(100%);
+                }}
+                50% {{
+                    border-color: rgba(199, 235, 255, 0.58);
+                    box-shadow:
+                        inset 0 1px 0 rgba(230, 248, 255, 0.32),
+                        0 0 20px rgba(120, 205, 255, 0.36);
+                    filter: saturate(122%);
+                }}
+            }}
+            @keyframes aiInsightSweep {{
+                0%, 14% {{ transform: translateX(-134%) rotate(8deg); opacity: 0; }}
+                28% {{ opacity: 1; }}
+                52% {{ transform: translateX(118%) rotate(8deg); opacity: 0.98; }}
+                100% {{ transform: translateX(134%) rotate(8deg); opacity: 0; }}
+            }}
             .js-plotly-plot .scatterlayer .trace:last-child path {{
                 transform-box: fill-box;
                 transform-origin: center;
                 animation: peakPulse 3.8s ease-in-out infinite;
+            }}
+            @media (prefers-reduced-motion: reduce) {{
+                .ai-insight-chip,
+                .ai-insight-chip::before {{
+                    animation: none !important;
+                }}
             }}
             @media (max-width: 1100px) {{
                 div[class*="st-key-kpi_row"] [data-testid="stHorizontalBlock"] {{
