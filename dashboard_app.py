@@ -174,6 +174,9 @@ def _inject_styles() -> None:
             div[class*="st-key-card_kpi_"] {
                 min-height: 146px;
             }
+            div[class*="st-key-card_workload_chart"] {
+                min-height: 520px;
+            }
             div[class*="st-key-card_kpi_"] .stMarkdown {
                 margin: 0 !important;
             }
@@ -235,7 +238,7 @@ def _inject_styles() -> None:
                 font-size: 0.76rem;
                 color: #AFC8FF;
                 margin-top: -2.4px;
-                margin-bottom: 9.4px;
+                margin-bottom: 12.4px;
             }
             .risk-signal-bar {
                 height: 0.42rem;
