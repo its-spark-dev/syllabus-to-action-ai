@@ -306,6 +306,21 @@ def _inject_styles() -> None:
                 min-width: 0;
                 height: 100%;
             }}
+            div[class*="st-key-card_ai_intelligence"] [data-testid="stHorizontalBlock"] {{
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                align-items: stretch !important;
+                gap: 18px;
+                width: 100%;
+            }}
+            div[class*="st-key-card_ai_intelligence"] [data-testid="stHorizontalBlock"] > [data-testid="column"] {{
+                min-width: 0 !important;
+                width: auto !important;
+                flex: 1 1 0 !important;
+            }}
+            div[class*="st-key-card_ai_intelligence"] [data-testid="stMetric"] {{
+                min-width: 0;
+            }}
             .hero-header {{
                 position: relative;
                 padding: 1.2rem 1.35rem 1.28rem;
@@ -1026,7 +1041,6 @@ def _render_peak_breakdown(contributors: List[Dict[str, object]], peak_week: str
         st.markdown(
             (
                 '<div class="ai-section-header">'
-                '<span class="ai-badge">AI GENERATED</span>'
                 '<div class="section-title">Peak Breakdown</div>'
                 "</div>"
             ),
@@ -1059,7 +1073,6 @@ def _render_simulation_results(
         st.markdown(
             (
                 '<div class="ai-section-header">'
-                '<span class="ai-badge">AI GENERATED</span>'
                 '<div class="section-title">What-if Results</div>'
                 "</div>"
             ),
@@ -1243,7 +1256,6 @@ def render_workload_chart(
         st.markdown(
             (
                 '<div class="ai-section-header">'
-                '<span class="ai-badge">AI GENERATED</span>'
                 '<div class="section-title">Weekly Workload</div>'
                 "</div>"
             ),
@@ -1548,7 +1560,6 @@ def render_grading_chart(study_guide: Dict[str, Dict[str, object]]) -> None:
         st.markdown(
             (
                 '<div class="ai-section-header">'
-                '<span class="ai-badge">AI GENERATED</span>'
                 '<div class="section-title">Grading Distribution by Course</div>'
                 "</div>"
             ),
