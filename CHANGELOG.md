@@ -1,6 +1,15 @@
 # Changelog
 
 ## [Unreleased]
+- Enhanced AI result card polish below top insight KPIs in `dashboard_app.py` with a reusable `.ai-badge` system (`AI GENERATED`) applied consistently to:
+  - Peak Breakdown
+  - What-if Results
+  - AI Workload Signal
+  - AI Intelligence Explanation
+  - AI Strategy
+  - Detailed Weekly Plan
+  - Study Guide Detail
+  Includes inline badge-title header composition, dark-theme-compatible glass gradient styling, 0.4s fade-in animation, and hover glow; preserved existing top insight chip visuals via separate `.ai-insight-chip`.
 - Added iCloud-style wallpaper assets in `assets/` and switched dashboard background rendering to use embedded base64 SVG wallpapers (`wallpaper.svg`, `wallpaper_dark.svg`) instead of prior synthetic gradient stacks.
 - Added client-side theme mode control (System/Light/Dark) with persisted preference and dynamic background asset switching in `dashboard_app.py`.
 - Tuned dark wallpaper rendering toward iCloud parity by adjusting SVG gradient stops/highlights and simplifying blend behavior; finalized app-level global tone with `brightness(0.90)` + `contrast(1.03)`.
