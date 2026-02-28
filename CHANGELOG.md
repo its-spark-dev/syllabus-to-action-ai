@@ -1,6 +1,10 @@
 # Changelog
 
 ## [Unreleased]
+- Added iCloud-style wallpaper assets in `assets/` and switched dashboard background rendering to use embedded base64 SVG wallpapers (`wallpaper.svg`, `wallpaper_dark.svg`) instead of prior synthetic gradient stacks.
+- Added client-side theme mode control (System/Light/Dark) with persisted preference and dynamic background asset switching in `dashboard_app.py`.
+- Tuned dark wallpaper rendering toward iCloud parity by adjusting SVG gradient stops/highlights and simplifying blend behavior; finalized app-level global tone with `brightness(0.90)` + `contrast(1.03)`.
+- Moved syllabus input text areas (`Course N syllabus`) from the main content area into the sidebar `Input` section and updated the empty-state guidance message accordingly.
 - Refactored dashboard card rendering in `dashboard_app.py` to use keyed Streamlit containers (`st.container(key=...)`) instead of HTML open/close wrappers, fixing cases where Plotly/table blocks rendered outside card boundaries.
 - Added container-key-scoped glass card styling for dashboard sections (charts, What-if, AI panels, detailed tables), including scoped `risk-red` variants for risk-focused cards.
 - Added KPI-card-only markdown reset to neutralize Streamlit default `<p>` margins:
