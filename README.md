@@ -1,5 +1,3 @@
-![CI](https://github.com/your-org/syllabus-to-action-ai/actions/workflows/ci.yml/badge.svg)
-
 # Syllabus-to-Action AI
 
 AI-powered hackathon project that turns unstructured course syllabi into prioritized, actionable weekly study plans.
@@ -31,10 +29,10 @@ syllabus-to-action-ai/
 ├── app.py                     # Primary portfolio entrypoint (Streamlit)
 ├── dashboard_app.py           # Optional premium dashboard UI variant
 ├── requirements.txt           # Python dependencies
-├── .env.example              # Optional WatsonX credentials template
+├── .env.example               # Optional WatsonX credentials template
 ├── .github/                  # GitHub workflows and templates
 │   └── workflows/
-│       └── ci.yml            # Compile + smoke checks
+│       └── ci.yml            # Compile/import + secret scan
 ├── Makefile                  # Quick developer commands
 ├── LICENSE                   # MIT
 ├── ai/                       # AI + planning engine glue
@@ -87,6 +85,13 @@ make verify     # compile + import smoke checks
 3. In the app, toggle **Use IBM AI for refinement**
 4. Keep default deterministic mode if you want reproducible results without external dependencies
 
+Example `.env`:
+```bash
+WATSONX_API_KEY=...
+WATSONX_URL=https://...
+WATSONX_PROJECT_ID=...
+```
+
 ## Example usage
 1. Open the app and choose the number of courses.
 2. Paste each syllabus into the text area.
@@ -108,13 +113,12 @@ You can also use the included sample button in the UI to quickly load mock sylla
 ## Screenshots
 ### UI snapshots
 
-Below is a visual reference of the current app theming.
+Store actual UI screenshots under `docs/screenshots/`:
 
-![Syllabus-to-Action AI visual style](assets/wallpaper.svg)
-
-To add real UI screenshots, place them in `docs/screenshots/`:
 - `docs/screenshots/app-home.png`
 - `docs/screenshots/dashboard-home.png`
+
+You can add the image links here later; keep them in repository root or GitHub CDN for stable rendering.
 
 ## API / behavior notes
 - Core planning is deterministic by default for stable results.
@@ -132,3 +136,6 @@ See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)
 
 ## Security
 See [SECURITY.md](SECURITY.md) for responsible vulnerability reporting.
+
+## Repo health checks
+- `make verify` (or CI) performs compile/import checks plus a lightweight secret scan.

@@ -2,59 +2,59 @@
 
 ## 1. System Goals
 
-The system aims to convert unstructured syllabus documents into structured, prioritized, and actionable weekly plans.
+Syllabus-to-Action AI converts unstructured course syllabi into structured, prioritized, and actionable weekly study plans.
 
-The AI component is not merely a summarizer but a reasoning engine.
-
----
+The AI layer is an explanation and strategy engine, not the sole planner.
 
 ## 2. Core Design Principles
 
-1. Simplicity of UI
-2. AI-driven reasoning
+1. Simple entrypoint for users (`app.py`)
+2. Deterministic baseline behavior
 3. Explainable prioritization
-4. Modular architecture
-5. Scalable deployment
-
----
+4. Modular code structure (`parser`, `planner`, `ai`)
+5. Portfolio-friendly deployability
 
 ## 3. Architecture Layers
 
 ### Layer 1: Extraction
 
-Parse unstructured syllabus text into structured data:
-- Assignments
-- Exams
-- Deadlines
-- Weight percentages
+Parse syllabus text into normalized objects:
+- assignments
+- quizzes
+- milestones
+- exams
+- grading weights and due dates
 
 ### Layer 2: Reasoning
 
-Using IBM WatsonX with Granite models:
-- Analyze workload
-- Detect deadline clustering
-- Evaluate grade weight importance
-- Prioritize tasks
+Core reasoning in planner layer:
+- derive weekly work buckets
+- calculate workload stress signals
+- prioritize items with guardrails around urgency and weight
+- produce study guide summary
+
+Optional AI refinement adds:
+- contextual insight text
+- strategic recommendations
+- scenario simulation interpretation
 
 ### Layer 3: Planning
 
-Generate:
-- Weekly to-do lists
-- Time-aware task breakdowns
-- Study focus areas
-
----
+Generate weekly outputs:
+- weekly to-do lists
+- prioritization rationale
+- summary and action guidance
 
 ## 4. Module Structure
 
-app.py – Streamlit UI  
-parser/ – syllabus parsing logic  
-planner/ – weekly plan generation  
-ai/ – IBM WatsonX integration  
-data/ – mock syllabi for testing  
-
----
+- `app.py` – Streamlit UI (primary entrypoint)
+- `parser/` – syllabus parsing logic
+- `planner/` – deterministic planning and scoring
+- `ai/` – AI/intelligence connectors and payload shaping
+- `data/` – mock syllabi fixtures
+- `scripts/` – local utility/testing scripts
+- `assets/` – UI visuals
 
 ## 5. Deployment Strategy
 
-The application can be deployed using IBM Cloud to demonstrate real-world scalability.
+Designed to run as a lightweight Streamlit app; optional AI calls can be toggled at runtime for portfolio demos.

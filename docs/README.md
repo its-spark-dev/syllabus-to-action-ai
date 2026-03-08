@@ -9,10 +9,14 @@ This folder centralizes non-root project docs for portfolio and contribution cla
 - [CONTRIBUTING.md](CONTRIBUTING.md)
 - [RELEASE_NOTES.md](RELEASE_NOTES.md)
 - [CHANGELOG.md](CHANGELOG.md)
-- [SECURITY.md](SECURITY.md)
+- [../SECURITY.md](../SECURITY.md)
 
-- `LICENSE` (repository root): MIT License
-- `Makefile` (repository root): setup/run/verify shortcuts
+- `../LICENSE` (repository root): MIT License
+- `../Makefile` (repository root): setup/run/verify shortcuts
 
 Optional docs area for visuals:
 - Add PNG screenshots under `screenshots/` and reference them from `README.md`.
+
+Suggested starter docs to check:
+- `docs/screenshots/app-home.png`
+- `docs/screenshots/dashboard-home.png`

@@ -2,39 +2,39 @@
 
 ## Requirements
 
-- Python 3.10+
-- pip or `python -m pip`
+- Python 3.10+  
+- `pip` or `python -m pip`
 
-## Setup
+## Quick setup
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+source .venv/bin/activate   # macOS/Linux
+# Windows:
+# .venv\Scripts\activate
 python -m pip install -r requirements.txt
 ```
 
-빠른 실행을 원하면 `Makefile`로도 동일하게 실행할 수 있습니다.
-```bash
-make setup
-```
+## Development shortcuts
 
-## Run
+- `make setup`: install dependencies
+- `make run`: run `app.py`
+- `make run-dashboard`: run `dashboard_app.py`
+- `make verify`: compile + import smoke checks (also used by CI)
+
+## Run the app
 
 ```bash
 streamlit run app.py
 ```
 
-또는
-```bash
-make run
-```
-
 ## Optional IBM WatsonX setup
 
-Create a `.env` file from `.env.example` and set:
+1. Copy `.env.example` to `.env`.
+2. Fill these values:
+   - `WATSONX_API_KEY`
+   - `WATSONX_URL`
+   - `WATSONX_PROJECT_ID`
+3. In the app, toggle **Use IBM AI for refinement**.
 
-- `WATSONX_API_KEY`
-- `WATSONX_URL`
-- `WATSONX_PROJECT_ID`
-
-Then enable **Use IBM AI for refinement** in the UI.
+The application still works without these variables; it falls back to deterministic behavior.
