@@ -11,15 +11,13 @@ This folder centralizes non-root project docs for portfolio and contribution cla
 - [CHANGELOG.md](CHANGELOG.md)
 - [../SECURITY.md](../SECURITY.md)
 
-- [media/](media)
-
 - `../LICENSE` (repository root): MIT License
 - `../Makefile` (repository root): setup/run/verify shortcuts
 
 Optional docs area for visuals:
 - Add PNG screenshots under `screenshots/` and reference them from `README.md`.
 - Keep both light and dark mode variants grouped in the same feature folder.
-- Add walkthrough links (e.g., Google Drive) for MP4/WEBM from `media/`.
+- Store walkthrough URLs in the root README as external links (Google Drive).
 - Screenshot assets referenced in the root README are from `dashboard_app.py` (final web UI).
 
 Suggested starter docs to check:

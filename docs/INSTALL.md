@@ -26,6 +26,9 @@ python -m pip install -r requirements.txt
 
 The demo video is hosted on Google Drive, so no large local media tracking is required.
 
+Current demo link:
+- https://drive.google.com/file/d/1LKwuDc0zfOlJM4A36M-e12_vtSoYhLCn/view?usp=sharing
+
 ## Run the app
 
 Use `app.py` to verify planning core flow quickly:

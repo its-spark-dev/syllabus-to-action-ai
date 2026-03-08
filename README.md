@@ -1,8 +1,8 @@
 # Syllabus-to-Action AI
 
-AI-powered hackathon project that turns unstructured course syllabi into prioritized, actionable weekly study plans.
+AI-powered hackathon project that converts unstructured course syllabi into prioritized, actionable weekly study plans.
 
-> **Project type:** Portfolio demo + prototype (hackathon-ready, production-friendly architecture)
+> **Project type:** Portfolio demo + prototype (hackathon-ready with production-friendly architecture)
 
 ## Hackathon context
 This project was built as a rapid-response demo focused on one pain point students repeatedly face: taking detailed syllabi and translating them into a weekly execution plan.
@@ -54,9 +54,10 @@ syllabus-to-action-ai/
 │   ├── RELEASE_NOTES.md
 │   ├── CHANGELOG.md
 │   ├── screenshots/
-│   └── media/                # Demo video and media assets
 └── .gitignore
 ```
+
+This structure keeps all documentation in one place while separating user-facing assets.
 
 ## Quick start
 ### 1) Install dependencies
@@ -115,7 +116,7 @@ You can also use the sample button in the UI to quickly load mock syllabi and ve
 Screenshots live in `docs/screenshots/`.
 All screenshots are captured from the final app interface in `dashboard_app.py`.
 
-### Light mode flow
+### Light mode
 - Home / landing
 <a href="docs/screenshots/app-home-light.png"><img src="docs/screenshots/app-home-light.png" alt="Home (light)" width="320" /></a>
 - Syllabus input
@@ -124,7 +125,7 @@ All screenshots are captured from the final app interface in `dashboard_app.py`.
 <a href="docs/screenshots/app-output-light-1.png"><img src="docs/screenshots/app-output-light-1.png" alt="Output 1 (light)" width="320" /></a>
 <a href="docs/screenshots/app-output-light-2.png"><img src="docs/screenshots/app-output-light-2.png" alt="Output 2 (light)" width="320" /></a>
 
-### Dark mode flow
+### Dark mode
 - Home / landing
 <a href="docs/screenshots/app-home-dark.png"><img src="docs/screenshots/app-home-dark.png" alt="Home (dark)" width="320" /></a>
 - Weekly plan output
@@ -152,6 +153,22 @@ All screenshots are captured from the final app interface in `dashboard_app.py`.
 - [x] Documentation consolidated under `docs/`
 - [x] CI guardrails (`.github/workflows/ci.yml`)
 - [x] Open-source license (`LICENSE`)
+
+## Public release checks
+```bash
+# 1) Verify local state
+git status --short
+
+# 2) Run the project checks
+make verify
+
+# 3) Validate public links (README.md demo links should open from an incognito session)
+
+# 4) Push with a clean release commit
+git add README.md docs/DESIGN.md docs/INSTALL.md docs/README.md docs/screenshots/*.png
+git commit -m "Prepare for public release"
+git push
+```
 
 ## Contributing
 See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)
