@@ -83,8 +83,9 @@ make verify     # compile + import smoke checks
 
 ### 3) (Optional) enable AI refinement
 1. Set `WATSONX_API_KEY` and `WATSONX_URL` environment variables
-2. In the app, toggle **Use IBM AI for refinement**
-3. Keep default deterministic mode if you want reproducible results without external dependencies
+2. (Optional but recommended) set `WATSONX_PROJECT_ID`
+3. In the app, toggle **Use IBM AI for refinement**
+4. Keep default deterministic mode if you want reproducible results without external dependencies
 
 ## Example usage
 1. Open the app and choose the number of courses.

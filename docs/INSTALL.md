@@ -35,5 +35,6 @@ Create a `.env` file from `.env.example` and set:
 
 - `WATSONX_API_KEY`
 - `WATSONX_URL`
+- `WATSONX_PROJECT_ID`
 
 Then enable **Use IBM AI for refinement** in the UI.
