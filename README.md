@@ -1,141 +1,180 @@
 # Syllabus-to-Action AI
 
-An AI-powered web application that converts multiple course syllabi into prioritized weekly to-do lists and study guides.
+AI-powered hackathon project that converts unstructured course syllabi into prioritized, actionable weekly study plans.
 
-## 🚀 Overview
+> **Project type:** Portfolio demo + prototype (hackathon-ready with production-friendly architecture)
 
-Students often receive detailed syllabi at the beginning of a semester but struggle to translate that information into actionable weekly execution plans.
+## Hackathon context
+This project was built as a rapid-response demo focused on one pain point students repeatedly face: taking detailed syllabi and translating them into a weekly execution plan.
 
-This project transforms static syllabi into dynamic, time-aware weekly to-do lists and structured study guides.
+The baseline app (`app.py`) remains stable and deterministic, with optional AI refinement via IBM WatsonX when credentials are configured.
 
-Powered by IBM WatsonX and Granite models.
+## What runs what
+- `app.py`: core planning engine shell used for validation and quick smoke checks.
+- `dashboard_app.py`: final portfolio web app with polished UI/UX. Public screenshots, demos, and user-facing behavior are based on this file.
 
----
+## What it does
+- Converts multiple syllabi into structured tasks (assignments, quizzes, milestones, exams)
+- Generates weekly workload-aware to-do lists
+- Prioritizes by urgency + grading weight + risk
+- Produces a course-level study guide summary
+- Explains why high-stress periods are risky
+- Keeps core planning deterministic even when AI is unavailable
 
-## 🎯 Problem
+## Tech stack
+- **Python 3.10+**
+- **Streamlit** for web UI
+- **IBM WatsonX + Granite** (optional AI refinement path)
+- **Regex / parser rules + scheduling engine** in `parser/` and `planner/`
 
-Students do not struggle due to lack of information.  
-They struggle due to lack of structured execution.
-
-Syllabi contain deadlines, exams, grading weights, and project milestones, but students must manually organize and prioritize these tasks.
-
----
-
-## 💡 Solution
-
-Syllabus-to-Action AI:
-
-- Extracts assignments, exams, and deadlines
-- Analyzes workload and assessment weight
-- Generates prioritized weekly to-do lists
-- Produces contextual study guides
-- Explains why tasks are prioritized
-
----
-
-## 🏗 Architecture
-
-User Input (Syllabi)
-→ Parsing Layer
-→ Reasoning Engine (IBM WatsonX + Granite)
-→ Weekly Plan Generator
-→ To-Do List + Study Guide Output
-
----
-
-## Deterministic Engine (Pre-AI State)
-
-- The planning core remains deterministic and reproducible.
-- `anchor_date` is required to keep scheduling stable across runs.
-- Official `grading_categories` are preserved exactly when present.
-- Distributed category weights are used internally for scoring only.
-- No artificial/distributed weights are displayed in UI task labels.
-- Weekly risk/stress metrics are computed deterministically and exposed to the AI intelligence layer.
-
-Architecture overview:
-`app.py` → `generate_plan_with_ai()` → `deterministic_ai_refinement()`
-
-Current runtime mode:
-- `USE_REAL_AI = False` (default)
-- IBM watsonx integration is available (`granite-4-h-small`) and guarded by deterministic fallback logic.
-
----
-
-## AI Intelligence Layer (Current)
-
-- Single-request AI contract with strict JSON schema validation.
-- Deterministic fallback is always available when parsing/model calls fail.
-- KPI block includes:
-  - `peak_stress_score`
-  - `volatility_index`
-  - `risk_week_ratio`
-  - `burnout_probability_percent`
-  - `acceleration_index`
-  - `compression_risk`
-  - `peak_delta_percent`
-  - compatibility aliases: `stress_acceleration_index`, `compression_risk_score`
-- Additional AI intelligence block (`ai_intelligence`) includes:
-  - `stress_score`, `acceleration_index`, `burnout_probability`
-  - `structural_overload`, `alert_level`
-  - `insights[]`, `strategy[]`, `confidence`
-- `why_risky` includes structured peak-week root-cause metrics:
-  - `exam_count`, `milestone_count`, `weekly_weight_sum`
-  - `compression_weight_percent`, `compression_window_days`
-  - `stress_acceleration_percent`
-- Simulation intelligence includes:
-  - deterministic scenario selection
-  - `simulation_impact` with peak delta + week-shift signal
-  - narrative reporting peak/shift/acceleration/compression changes
-- Time allocation strategy is derived from:
-  - total exam weight across courses
-  - compression presence
-  - nearest upcoming exam weight
-  - normalized to 100%.
-- AI KPI binding rules:
-  - `acceleration_index` is derived from max weekly `stress_acceleration_percent`.
-  - `compression_risk` is derived from peak-week `compression_weight_percent * compression_window_days`.
-  - peak-week mismatch emits a warning log and falls back to highest-stress week.
-
----
-
-## Dashboards
-
-- `app.py`: baseline Streamlit interface.
-- `dashboard_app.py`: premium SaaS-style dashboard (glass dark theme + Plotly intelligence charts) using the same backend outputs without changing engine behavior.
-
----
-
-## Quick Validation
-
-Run AI layer integration check with mock syllabi:
-
-```bash
-python3 ai/test_ai.py
+## Repository structure
+```text
+syllabus-to-action-ai/
+├── app.py                     # Core engine validation shell (streamlit)
+├── dashboard_app.py           # Final portfolio Streamlit app
+├── requirements.txt           # Python dependencies
+├── .env.example               # Optional WatsonX credentials template
+├── .github/                  # GitHub workflows and templates
+│   └── workflows/
+│       └── ci.yml            # Compile/import + secret scan
+├── Makefile                  # Quick developer commands
+├── LICENSE                   # MIT
+├── ai/                       # AI + planning engine glue
+├── parser/                   # Syllabus parsing logic
+├── planner/                  # Deterministic weekly planner
+├── data/                     # Mock syllabi used for manual testing
+├── assets/                   # UI assets (themes, background visuals)
+├── scripts/                  # Utility/test scripts
+├── docs/                     # Project documentation
+│   ├── ARCHITECTURE.md
+│   ├── DESIGN.md
+│   ├── INSTALL.md
+│   ├── USAGE.md
+│   ├── CONTRIBUTING.md
+│   ├── RELEASE_NOTES.md
+│   ├── CHANGELOG.md
+│   ├── screenshots/
+└── .gitignore
 ```
 
----
+This structure keeps all documentation in one place while separating user-facing assets.
 
-## 🔮 Future Improvements
+## Quick start
+### 1) Install dependencies
+```bash
+python -m venv .venv
+source .venv/bin/activate  # macOS/Linux
+python -m pip install -r requirements.txt
+```
 
-- Canvas LMS integration
-- Real-time assignment sync
-- Personalized study time adjustments
-- Workload overload detection
-- Calendar export support
+### 2) Run the app
+Use `app.py` first if you want to verify core behavior:
+```bash
+streamlit run app.py
+```
 
----
+Use `dashboard_app.py` for the final UI demo and portfolio artifact:
+```bash
+streamlit run dashboard_app.py
+```
 
-## 🧠 Tech Stack
+You can also use Makefile shortcuts:
+```bash
+make setup      # install dependencies
+make run        # run app.py
+make run-dashboard # run dashboard_app.py
+make verify     # compile + import smoke checks
+```
 
-- Python
-- Streamlit
-- IBM WatsonX
-- Granite LLM
-- IBM Cloud (deployment ready)
+### 3) (Optional) enable AI refinement
+1. Set `WATSONX_API_KEY` and `WATSONX_URL` environment variables
+2. (Optional but recommended) set `WATSONX_PROJECT_ID`
+3. In the app, toggle **Use IBM AI for refinement**
+4. Keep default deterministic mode if you want reproducible results without external dependencies
 
----
+Example `.env`:
+```bash
+WATSONX_API_KEY=...
+WATSONX_URL=https://...
+WATSONX_PROJECT_ID=...
+```
 
-## 📦 Status
+## Example usage
+1. Open the app and choose the number of courses.
+2. Paste each syllabus into the text area.
+3. Click **Generate Plan**.
+4. Review:
+   - `Weekly To-Do Lists`
+   - `Study Guide`
+   - summary cards (focus tasks + upcoming high-stakes assessments)
 
-MVP under active development.
-IBM AI integration completed during hackathon phase.
+You can also use the sample button in the UI to quickly load mock syllabi and verify output end-to-end.
+
+## Screenshots
+### UI snapshots
+
+Screenshots live in `docs/screenshots/`.
+All screenshots are captured from the final app interface in `dashboard_app.py`.
+
+### Light mode
+- Home / landing
+<a href="docs/screenshots/app-home-light.png"><img src="docs/screenshots/app-home-light.png" alt="Home (light)" width="320" /></a>
+- Syllabus input
+<a href="docs/screenshots/app-input.png"><img src="docs/screenshots/app-input.png" alt="Input (light)" width="320" /></a>
+- Weekly plan output
+<a href="docs/screenshots/app-output-light-1.png"><img src="docs/screenshots/app-output-light-1.png" alt="Output 1 (light)" width="320" /></a>
+<a href="docs/screenshots/app-output-light-2.png"><img src="docs/screenshots/app-output-light-2.png" alt="Output 2 (light)" width="320" /></a>
+
+### Dark mode
+- Home / landing
+<a href="docs/screenshots/app-home-dark.png"><img src="docs/screenshots/app-home-dark.png" alt="Home (dark)" width="320" /></a>
+- Weekly plan output
+<a href="docs/screenshots/app-output-dark-1.png"><img src="docs/screenshots/app-output-dark-1.png" alt="Output 1 (dark)" width="320" /></a>
+<a href="docs/screenshots/app-output-dark-2.png"><img src="docs/screenshots/app-output-dark-2.png" alt="Output 2 (dark)" width="320" /></a>
+
+## Demo assets
+- [Final demo walkthrough (Google Drive)](https://drive.google.com/file/d/1LKwuDc0zfOlJM4A36M-e12_vtSoYhLCn/view?usp=sharing)
+- [Final demo media download (MP4)](https://drive.google.com/uc?export=download&id=1LKwuDc0zfOlJM4A36M-e12_vtSoYhLCn)
+
+## API / behavior notes
+- Core planning is deterministic by default for stable results.
+- AI refinement is additive and guarded behind a strict validation + fallback path.
+- The planner output contracts are defined by module boundaries in `parser/`, `planner/`, and `ai/`.
+
+## Developer experience improvements
+- Primary documentation now lives in one place: `docs/`
+- `app.py` is the explicit engine validation entrypoint; `dashboard_app.py` is the final web deliverable
+- Optional helper script is separated into `scripts/`
+- Lightweight structure makes onboarding new contributors easy
+
+## Public project checklist
+- [x] Clear entrypoint split: engine validation (`app.py`) and final web UI (`dashboard_app.py`)
+- [x] Reproducible setup (`requirements.txt`, `Makefile`, `.env.example`)
+- [x] Documentation consolidated under `docs/`
+- [x] CI guardrails (`.github/workflows/ci.yml`)
+- [x] Open-source license (`LICENSE`)
+
+## Public release checks
+```bash
+# 1) Verify local state
+git status --short
+
+# 2) Run the project checks
+make verify
+
+# 3) Validate public links (README.md demo links should open from an incognito session)
+
+# 4) Push with a clean release commit
+git add README.md docs/DESIGN.md docs/INSTALL.md docs/README.md docs/screenshots/*.png
+git commit -m "Prepare for public release"
+git push
+```
+
+## Contributing
+See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)
+
+## Security
+See [SECURITY.md](SECURITY.md) for responsible vulnerability reporting.
+
+## Repo health checks
+- `make verify` (or CI): compile/import checks + lightweight secret scan
