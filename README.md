@@ -1,141 +1,108 @@
 # Syllabus-to-Action AI
 
-An AI-powered web application that converts multiple course syllabi into prioritized weekly to-do lists and study guides.
+AI-powered hackathon project that turns unstructured course syllabi into prioritized, actionable weekly study plans.
 
-## 🚀 Overview
+> **Project type:** Portfolio demo + prototype (hackathon-ready, production-friendly architecture)
 
-Students often receive detailed syllabi at the beginning of a semester but struggle to translate that information into actionable weekly execution plans.
+## Hackathon context
+This project was built as a rapid-response demo focused on one pain point students repeatedly face: taking detailed syllabi and turning them into a weekly execution plan.
 
-This project transforms static syllabi into dynamic, time-aware weekly to-do lists and structured study guides.
+The baseline app (`app.py`) remains stable and deterministic, with optional AI refinement via IBM WatsonX when credentials are configured.
 
-Powered by IBM WatsonX and Granite models.
+## What it does
+- Converts multiple syllabi into structured tasks (assignments, quizzes, milestones, exams)
+- Generates weekly workload-aware to-do lists
+- Prioritizes by urgency + grading weight + risk
+- Produces a course-level study guide summary
+- Explains why high-stress periods are risky
+- Keeps core planning deterministic even when AI is unavailable
 
----
+## Tech stack
+- **Python 3.10+**
+- **Streamlit** for web UI
+- **IBM WatsonX + Granite** (optional AI refinement path)
+- **Regex / parser rules + scheduling engine** in `parser/` and `planner/`
 
-## 🎯 Problem
-
-Students do not struggle due to lack of information.  
-They struggle due to lack of structured execution.
-
-Syllabi contain deadlines, exams, grading weights, and project milestones, but students must manually organize and prioritize these tasks.
-
----
-
-## 💡 Solution
-
-Syllabus-to-Action AI:
-
-- Extracts assignments, exams, and deadlines
-- Analyzes workload and assessment weight
-- Generates prioritized weekly to-do lists
-- Produces contextual study guides
-- Explains why tasks are prioritized
-
----
-
-## 🏗 Architecture
-
-User Input (Syllabi)
-→ Parsing Layer
-→ Reasoning Engine (IBM WatsonX + Granite)
-→ Weekly Plan Generator
-→ To-Do List + Study Guide Output
-
----
-
-## Deterministic Engine (Pre-AI State)
-
-- The planning core remains deterministic and reproducible.
-- `anchor_date` is required to keep scheduling stable across runs.
-- Official `grading_categories` are preserved exactly when present.
-- Distributed category weights are used internally for scoring only.
-- No artificial/distributed weights are displayed in UI task labels.
-- Weekly risk/stress metrics are computed deterministically and exposed to the AI intelligence layer.
-
-Architecture overview:
-`app.py` → `generate_plan_with_ai()` → `deterministic_ai_refinement()`
-
-Current runtime mode:
-- `USE_REAL_AI = False` (default)
-- IBM watsonx integration is available (`granite-4-h-small`) and guarded by deterministic fallback logic.
-
----
-
-## AI Intelligence Layer (Current)
-
-- Single-request AI contract with strict JSON schema validation.
-- Deterministic fallback is always available when parsing/model calls fail.
-- KPI block includes:
-  - `peak_stress_score`
-  - `volatility_index`
-  - `risk_week_ratio`
-  - `burnout_probability_percent`
-  - `acceleration_index`
-  - `compression_risk`
-  - `peak_delta_percent`
-  - compatibility aliases: `stress_acceleration_index`, `compression_risk_score`
-- Additional AI intelligence block (`ai_intelligence`) includes:
-  - `stress_score`, `acceleration_index`, `burnout_probability`
-  - `structural_overload`, `alert_level`
-  - `insights[]`, `strategy[]`, `confidence`
-- `why_risky` includes structured peak-week root-cause metrics:
-  - `exam_count`, `milestone_count`, `weekly_weight_sum`
-  - `compression_weight_percent`, `compression_window_days`
-  - `stress_acceleration_percent`
-- Simulation intelligence includes:
-  - deterministic scenario selection
-  - `simulation_impact` with peak delta + week-shift signal
-  - narrative reporting peak/shift/acceleration/compression changes
-- Time allocation strategy is derived from:
-  - total exam weight across courses
-  - compression presence
-  - nearest upcoming exam weight
-  - normalized to 100%.
-- AI KPI binding rules:
-  - `acceleration_index` is derived from max weekly `stress_acceleration_percent`.
-  - `compression_risk` is derived from peak-week `compression_weight_percent * compression_window_days`.
-  - peak-week mismatch emits a warning log and falls back to highest-stress week.
-
----
-
-## Dashboards
-
-- `app.py`: baseline Streamlit interface.
-- `dashboard_app.py`: premium SaaS-style dashboard (glass dark theme + Plotly intelligence charts) using the same backend outputs without changing engine behavior.
-
----
-
-## Quick Validation
-
-Run AI layer integration check with mock syllabi:
-
-```bash
-python3 ai/test_ai.py
+## Repository structure
+```
+syllabus-to-action-ai/
+├── app.py                     # Primary portfolio entrypoint (Streamlit)
+├── dashboard_app.py           # Optional premium dashboard UI variant
+├── requirements.txt           # Python dependencies
+├── .env.example              # Optional WatsonX credentials template
+├── ai/                       # AI + planning engine glue
+├── parser/                   # Syllabus parsing logic
+├── planner/                  # Deterministic weekly planner
+├── data/                     # Mock sample syllabi used for manual testing
+├── assets/                   # UI assets (themes, background visuals)
+├── scripts/                  # Utility/test scripts
+├── docs/                     # Project documentation
+│   ├── ARCHITECTURE.md
+│   ├── DESIGN.md
+│   ├── INSTALL.md
+│   ├── USAGE.md
+│   ├── CONTRIBUTING.md
+│   ├── RELEASE_NOTES.md
+│   ├── CHANGELOG.md
+│   └── screenshots/
+└── .gitignore
 ```
 
----
+## Quick start
+### 1) Install dependencies
+```bash
+python -m venv .venv
+source .venv/bin/activate  # macOS/Linux
+python -m pip install -r requirements.txt
+```
 
-## 🔮 Future Improvements
+### 2) Run the app
+```bash
+streamlit run app.py
+```
 
-- Canvas LMS integration
-- Real-time assignment sync
-- Personalized study time adjustments
-- Workload overload detection
-- Calendar export support
+Optional: run the premium UI
+```bash
+streamlit run dashboard_app.py
+```
 
----
+### 3) (Optional) enable AI refinement
+1. Set `WATSONX_API_KEY` and `WATSONX_URL` environment variables
+2. In the app, toggle **Use IBM AI for refinement**
+3. Keep default deterministic mode if you want reproducible results without external dependencies
 
-## 🧠 Tech Stack
+## Example usage
+1. Open the app and choose the number of courses.
+2. Paste each syllabus into the text area.
+3. Click **Generate Plan**.
+4. Review:
+   - `Weekly To-Do Lists`
+   - `Study Guide`
+   - summary cards (focus tasks + upcoming high-stakes assessments)
 
-- Python
-- Streamlit
-- IBM WatsonX
-- Granite LLM
-- IBM Cloud (deployment ready)
+You can also use the included sample button in the UI to quickly load mock syllabi and verify the plan output end-to-end.
 
----
+## Screenshots
+### UI snapshots
 
-## 📦 Status
+Below is a visual reference of the current app theming.
 
-MVP under active development.
-IBM AI integration completed during hackathon phase.
+![Syllabus-to-Action AI visual style](assets/wallpaper.svg)
+
+To add real UI screenshots, place them in `docs/screenshots/`:
+- `docs/screenshots/app-home.png`
+- `docs/screenshots/dashboard-home.png`
+
+## API / behavior notes
+- Core planning is deterministic by default for stable results.
+- AI refinement is additive and guarded behind a strict validation + fallback path.
+- The planner output contracts are defined by module boundaries in `parser/`, `planner/`, and `ai/`.
+
+## Developer experience improvements
+- Primary documentation now lives in one place: `docs/`
+- Entry point is explicit (`app.py`)
+- Optional helper script is separated into `scripts/`
+- Lightweight structure makes onboarding new contributors easy
+
+## Contributing
+See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)
