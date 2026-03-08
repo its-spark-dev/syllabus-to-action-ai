@@ -8,7 +8,9 @@ The AI layer is an explanation and strategy engine, not the sole planner.
 
 ## 2. Core Design Principles
 
-1. Simple entrypoint for users (`app.py`)
+1. Split entrypoints by purpose:
+   - `app.py`: core validation and engine entrypoint
+   - `dashboard_app.py`: final polished portfolio experience
 2. Deterministic baseline behavior
 3. Explainable prioritization
 4. Modular code structure (`parser`, `planner`, `ai`)
@@ -47,7 +49,8 @@ Generate weekly outputs:
 
 ## 4. Module Structure
 
-- `app.py` – Streamlit UI (primary entrypoint)
+- `app.py` – Streamlit UI used for core validation and engine verification
+- `dashboard_app.py` – final Streamlit UI used as public portfolio deliverable
 - `parser/` – syllabus parsing logic
 - `planner/` – deterministic planning and scoring
 - `ai/` – AI/intelligence connectors and payload shaping

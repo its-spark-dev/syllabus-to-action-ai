@@ -18,14 +18,24 @@ python -m pip install -r requirements.txt
 ## Development shortcuts
 
 - `make setup`: install dependencies
-- `make run`: run `app.py`
+- `make run`: run `app.py` (engine validation shell)
 - `make run-dashboard`: run `dashboard_app.py`
 - `make verify`: compile + import smoke checks (also used by CI)
 
+## Demo assets
+
+The demo video is hosted on Google Drive, so no large local media tracking is required.
+
 ## Run the app
 
+Use `app.py` to verify planning core flow quickly:
 ```bash
 streamlit run app.py
+```
+
+Use `dashboard_app.py` for the final portfolio web experience:
+```bash
+streamlit run dashboard_app.py
 ```
 
 ## Optional IBM WatsonX setup

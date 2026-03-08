@@ -9,6 +9,10 @@ This project was built as a rapid-response demo focused on one pain point studen
 
 The baseline app (`app.py`) remains stable and deterministic, with optional AI refinement via IBM WatsonX when credentials are configured.
 
+## What runs what
+- `app.py`: core planning engine shell used for validation and quick smoke checks.
+- `dashboard_app.py`: final portfolio web app with polished UI/UX. Public screenshots, demos, and user-facing behavior are based on this file.
+
 ## What it does
 - Converts multiple syllabi into structured tasks (assignments, quizzes, milestones, exams)
 - Generates weekly workload-aware to-do lists
@@ -26,8 +30,8 @@ The baseline app (`app.py`) remains stable and deterministic, with optional AI r
 ## Repository structure
 ```text
 syllabus-to-action-ai/
-├── app.py                     # Primary portfolio entrypoint (Streamlit)
-├── dashboard_app.py           # Optional premium dashboard UI variant
+├── app.py                     # Core engine validation shell (streamlit)
+├── dashboard_app.py           # Final portfolio Streamlit app
 ├── requirements.txt           # Python dependencies
 ├── .env.example               # Optional WatsonX credentials template
 ├── .github/                  # GitHub workflows and templates
@@ -49,7 +53,8 @@ syllabus-to-action-ai/
 │   ├── CONTRIBUTING.md
 │   ├── RELEASE_NOTES.md
 │   ├── CHANGELOG.md
-│   └── screenshots/
+│   ├── screenshots/
+│   └── media/                # Demo video and media assets
 └── .gitignore
 ```
 
@@ -62,11 +67,12 @@ python -m pip install -r requirements.txt
 ```
 
 ### 2) Run the app
+Use `app.py` first if you want to verify core behavior:
 ```bash
 streamlit run app.py
 ```
 
-Optional: run the premium UI
+Use `dashboard_app.py` for the final UI demo and portfolio artifact:
 ```bash
 streamlit run dashboard_app.py
 ```
@@ -106,9 +112,28 @@ You can also use the sample button in the UI to quickly load mock syllabi and ve
 ## Screenshots
 ### UI snapshots
 
-Add real UI images in `docs/screenshots/` and reference them here:
-- `docs/screenshots/app-home.png`
-- `docs/screenshots/dashboard-home.png`
+Screenshots live in `docs/screenshots/`.
+All screenshots are captured from the final app interface in `dashboard_app.py`.
+
+### Light mode flow
+- Home / landing
+<a href="docs/screenshots/app-home-light.png"><img src="docs/screenshots/app-home-light.png" alt="Home (light)" width="320" /></a>
+- Syllabus input
+<a href="docs/screenshots/app-input.png"><img src="docs/screenshots/app-input.png" alt="Input (light)" width="320" /></a>
+- Weekly plan output
+<a href="docs/screenshots/app-output-light-1.png"><img src="docs/screenshots/app-output-light-1.png" alt="Output 1 (light)" width="320" /></a>
+<a href="docs/screenshots/app-output-light-2.png"><img src="docs/screenshots/app-output-light-2.png" alt="Output 2 (light)" width="320" /></a>
+
+### Dark mode flow
+- Home / landing
+<a href="docs/screenshots/app-home-dark.png"><img src="docs/screenshots/app-home-dark.png" alt="Home (dark)" width="320" /></a>
+- Weekly plan output
+<a href="docs/screenshots/app-output-dark-1.png"><img src="docs/screenshots/app-output-dark-1.png" alt="Output 1 (dark)" width="320" /></a>
+<a href="docs/screenshots/app-output-dark-2.png"><img src="docs/screenshots/app-output-dark-2.png" alt="Output 2 (dark)" width="320" /></a>
+
+## Demo assets
+- [Final demo walkthrough (Google Drive)](https://drive.google.com/file/d/1LKwuDc0zfOlJM4A36M-e12_vtSoYhLCn/view?usp=sharing)
+- [Final demo media download (MP4)](https://drive.google.com/uc?export=download&id=1LKwuDc0zfOlJM4A36M-e12_vtSoYhLCn)
 
 ## API / behavior notes
 - Core planning is deterministic by default for stable results.
@@ -117,12 +142,12 @@ Add real UI images in `docs/screenshots/` and reference them here:
 
 ## Developer experience improvements
 - Primary documentation now lives in one place: `docs/`
-- Entry point is explicit (`app.py`)
+- `app.py` is the explicit engine validation entrypoint; `dashboard_app.py` is the final web deliverable
 - Optional helper script is separated into `scripts/`
 - Lightweight structure makes onboarding new contributors easy
 
 ## Public project checklist
-- [x] Clean structure and clear entrypoint (`app.py`)
+- [x] Clear entrypoint split: engine validation (`app.py`) and final web UI (`dashboard_app.py`)
 - [x] Reproducible setup (`requirements.txt`, `Makefile`, `.env.example`)
 - [x] Documentation consolidated under `docs/`
 - [x] CI guardrails (`.github/workflows/ci.yml`)
