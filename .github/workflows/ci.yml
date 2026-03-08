@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Compile and import check
+        run: |
+          python -m compileall app.py dashboard_app.py ai parser planner data
+          python - <<'PY'
+from importlib import import_module
+for mod in [
+    'ai.engine',
+    'parser.syllabus_parser',
+    'planner.weekly_planner',
+]:
+    import_module(mod)
+print('ok: imports')
+PY

@@ -13,10 +13,20 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 python -m pip install -r requirements.txt
 ```
 
+빠른 실행을 원하면 `Makefile`로도 동일하게 실행할 수 있습니다.
+```bash
+make setup
+```
+
 ## Run
 
 ```bash
 streamlit run app.py
+```
+
+또는
+```bash
+make run
 ```
 
 ## Optional IBM WatsonX setup

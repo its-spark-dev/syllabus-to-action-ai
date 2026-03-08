@@ -1,3 +1,5 @@
+![CI](https://github.com/your-org/syllabus-to-action-ai/actions/workflows/ci.yml/badge.svg)
+
 # Syllabus-to-Action AI
 
 AI-powered hackathon project that turns unstructured course syllabi into prioritized, actionable weekly study plans.
@@ -30,6 +32,11 @@ syllabus-to-action-ai/
 ├── dashboard_app.py           # Optional premium dashboard UI variant
 ├── requirements.txt           # Python dependencies
 ├── .env.example              # Optional WatsonX credentials template
+├── .github/                  # GitHub workflows and templates
+│   └── workflows/
+│       └── ci.yml            # Compile + smoke checks
+├── Makefile                  # Quick developer commands
+├── LICENSE                   # MIT
 ├── ai/                       # AI + planning engine glue
 ├── parser/                   # Syllabus parsing logic
 ├── planner/                  # Deterministic weekly planner
@@ -66,6 +73,14 @@ Optional: run the premium UI
 streamlit run dashboard_app.py
 ```
 
+You can also use Makefile shortcuts:
+```bash
+make setup      # install dependencies
+make run        # run app.py
+make run-dashboard # run dashboard_app.py
+make verify     # compile + import smoke checks
+```
+
 ### 3) (Optional) enable AI refinement
 1. Set `WATSONX_API_KEY` and `WATSONX_URL` environment variables
 2. In the app, toggle **Use IBM AI for refinement**
@@ -81,6 +96,13 @@ streamlit run dashboard_app.py
    - summary cards (focus tasks + upcoming high-stakes assessments)
 
 You can also use the included sample button in the UI to quickly load mock syllabi and verify the plan output end-to-end.
+
+## Public project checklist
+- [x] Clean structure and clear entrypoint (`app.py`)
+- [x] Reproducible setup (`requirements.txt`, `Makefile`, `.env.example`)
+- [x] Documentation consolidated under `docs/`
+- [x] CI guardrails (`.github/workflows/ci.yml`)
+- [x] Open-source license (`LICENSE`)
 
 ## Screenshots
 ### UI snapshots
@@ -106,3 +128,6 @@ To add real UI screenshots, place them in `docs/screenshots/`:
 
 ## Contributing
 See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)
+
+## Security
+See [SECURITY.md](SECURITY.md) for responsible vulnerability reporting.
