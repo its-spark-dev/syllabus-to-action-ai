@@ -5,7 +5,7 @@ AI-powered hackathon project that turns unstructured course syllabi into priorit
 > **Project type:** Portfolio demo + prototype (hackathon-ready, production-friendly architecture)
 
 ## Hackathon context
-This project was built as a rapid-response demo focused on one pain point students repeatedly face: taking detailed syllabi and turning them into a weekly execution plan.
+This project was built as a rapid-response demo focused on one pain point students repeatedly face: taking detailed syllabi and translating them into a weekly execution plan.
 
 The baseline app (`app.py`) remains stable and deterministic, with optional AI refinement via IBM WatsonX when credentials are configured.
 
@@ -24,7 +24,7 @@ The baseline app (`app.py`) remains stable and deterministic, with optional AI r
 - **Regex / parser rules + scheduling engine** in `parser/` and `planner/`
 
 ## Repository structure
-```
+```text
 syllabus-to-action-ai/
 ├── app.py                     # Primary portfolio entrypoint (Streamlit)
 ├── dashboard_app.py           # Optional premium dashboard UI variant
@@ -38,7 +38,7 @@ syllabus-to-action-ai/
 ├── ai/                       # AI + planning engine glue
 ├── parser/                   # Syllabus parsing logic
 ├── planner/                  # Deterministic weekly planner
-├── data/                     # Mock sample syllabi used for manual testing
+├── data/                     # Mock syllabi used for manual testing
 ├── assets/                   # UI assets (themes, background visuals)
 ├── scripts/                  # Utility/test scripts
 ├── docs/                     # Project documentation
@@ -101,24 +101,14 @@ WATSONX_PROJECT_ID=...
    - `Study Guide`
    - summary cards (focus tasks + upcoming high-stakes assessments)
 
-You can also use the included sample button in the UI to quickly load mock syllabi and verify the plan output end-to-end.
-
-## Public project checklist
-- [x] Clean structure and clear entrypoint (`app.py`)
-- [x] Reproducible setup (`requirements.txt`, `Makefile`, `.env.example`)
-- [x] Documentation consolidated under `docs/`
-- [x] CI guardrails (`.github/workflows/ci.yml`)
-- [x] Open-source license (`LICENSE`)
+You can also use the sample button in the UI to quickly load mock syllabi and verify output end-to-end.
 
 ## Screenshots
 ### UI snapshots
 
-Store actual UI screenshots under `docs/screenshots/`:
-
+Add real UI images in `docs/screenshots/` and reference them here:
 - `docs/screenshots/app-home.png`
 - `docs/screenshots/dashboard-home.png`
-
-You can add the image links here later; keep them in repository root or GitHub CDN for stable rendering.
 
 ## API / behavior notes
 - Core planning is deterministic by default for stable results.
@@ -131,6 +121,13 @@ You can add the image links here later; keep them in repository root or GitHub C
 - Optional helper script is separated into `scripts/`
 - Lightweight structure makes onboarding new contributors easy
 
+## Public project checklist
+- [x] Clean structure and clear entrypoint (`app.py`)
+- [x] Reproducible setup (`requirements.txt`, `Makefile`, `.env.example`)
+- [x] Documentation consolidated under `docs/`
+- [x] CI guardrails (`.github/workflows/ci.yml`)
+- [x] Open-source license (`LICENSE`)
+
 ## Contributing
 See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)
 
@@ -138,4 +135,4 @@ See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)
 See [SECURITY.md](SECURITY.md) for responsible vulnerability reporting.
 
 ## Repo health checks
-- `make verify` (or CI) performs compile/import checks plus a lightweight secret scan.
+- `make verify` (or CI): compile/import checks + lightweight secret scan
